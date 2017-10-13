@@ -1,83 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 using Framework.Infrastructure.Exceptions;
+using Framework.Infrastructure.Models.Search;
 
 namespace Framework.Infrastructure.Models.Result
 {
-    public class ReturnListModel<TModel,TSearch> : IReturnModel
-        where TSearch : class
+    public class ReturnListModel<TModel> : ReturnListWithSearchModel
+        <TModel, BaseSearchCriteria>
     {
-        public ReturnListModel(TSearch search, List<TModel> items, long totalItems)
-        {
-            Model = items;
-            TotalRecords = totalItems;
-            IsSuccess = true;
-            Search = search;
-        }
-
-        public ReturnListModel(TSearch search, List<TModel> items)
-        {
-            Model = items;
-            TotalRecords = items.Count;
-            IsSuccess = true;
-            Search = search;
-        }
-
         public ReturnListModel(List<TModel> items, long totalItems)
-            : this((TSearch)null, items, totalItems)
+            : base(null,items, totalItems)
         {
         }
 
         public ReturnListModel(List<TModel> items)
-            : this((TSearch)null, items)
+            : base(items)
         {
-        }
-
-        public ReturnListModel(TSearch search, Exception ex)
-        {
-            IsSuccess = false;
-            ErrorHolder = new Error(ex);
-        }
-
-        public ReturnListModel(TSearch search, string errorMsg, Exception ex = null)
-        {
-            IsSuccess = false;
-            ErrorHolder = new Error(errorMsg, ex);
-        }
-
-        public ReturnListModel(TSearch search, string errorMsg, List<ErrorItem> errorList)
-        {
-            IsSuccess = false;
-            ErrorHolder = new Error(errorMsg, errorList);
         }
 
         public ReturnListModel(Exception ex)
-            : this((TSearch)null, ex)
+            : base(ex)
         {
         }
 
         public ReturnListModel(string errorMsg, Exception ex = null)
-            : this((TSearch)null, errorMsg, ex)
+            : base(errorMsg, ex)
         {
         }
 
         public ReturnListModel(string errorMsg, List<ErrorItem> errorList)
-            : this((TSearch)null, errorMsg, errorList)
+            : base(errorMsg, errorList)
         {
         }
 
-        public List<TModel> Model { get; private set; }
+        public static new ReturnListModel<TModel> Success(List<TModel> objList)
+        {
+            return new ReturnListModel<TModel>(objList) { IsSuccess = true };
+        }
 
-        public TSearch Search { get; private set; }
+        public static new ReturnListModel<TModel> Success(List<TModel> objList, long totalItems)
+        {
+            return new ReturnListModel<TModel>(objList, totalItems) { IsSuccess = true };
+        }
 
-        public int ActiveTab { get; set; }
+        public static new ReturnListModel<TModel> Error(Exception ex)
+        {
+            return new ReturnListModel<TModel>(ex) { IsSuccess = false };
+        }
 
-        public long TotalRecords { get; private set; }
+        public static new ReturnListModel<TModel> Error(string errorMsg, Exception ex = null)
+        {
+            return new ReturnListModel<TModel>(errorMsg, ex) { IsSuccess = false };
+        }
 
-        public bool IsSuccess { get; set; }
-
-        public Error ErrorHolder { get; set; }
-
-        public int HttpCode { get; set; }
+        public static new ReturnListModel<TModel> Error(string errorMsg, List<ErrorItem> errorList)
+        {
+            return new ReturnListModel<TModel>(errorMsg, errorList) { IsSuccess = false };
+        }
     }
 }

@@ -39,5 +39,38 @@ namespace Framework.Infrastructure.Models.Result
         public int ActiveTab { get; set; }
 
         public int HttpCode { get; set; }
+
+        public static ReturnModel<T> Success(T obj)
+        {
+            return new ReturnModel<T>(obj) { IsSuccess = true };
+        }
+
+        public static ReturnModel<T> Error(Exception ex)
+        {
+            return new ReturnModel<T>(ex) { IsSuccess = false };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, Exception ex = null)
+        {
+            return new ReturnModel<T>(errorMsg, ex) { IsSuccess = false };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, List<ErrorItem> errorList)
+        {
+            return new ReturnModel<T>(errorMsg, errorList) { IsSuccess = false };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, List<string> errorMsgList)
+        {
+            var errorList = new List<ErrorItem>();
+            foreach (var msg in errorMsgList)
+                errorList.Add(new ErrorItem() { Value = msg });
+            return new ReturnModel<T>(errorMsg, errorList) { IsSuccess = false };
+        }
+
+        public static ReturnModel<T> Error(List<string> errorMsgList)
+        {
+            return Error("", errorMsgList);
+        }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Framework.Infrastructure.Logging
 {
-    public class PerfLog : IDisposable
+    public class PerformanceLog : IDisposable
     {
         private readonly string module = string.Empty;
         private readonly string function = string.Empty;
@@ -13,7 +13,7 @@ namespace Framework.Infrastructure.Logging
         private ILog log;
         private DateTime startTime, endTime;
 
-        public PerfLog(ILog log, string moduleName, string functionName, bool startMeasuringOnCreate, bool autoCloseIsError, bool logToDefaultLogger = true)
+        public PerformanceLog(ILog log, string moduleName, string functionName, bool startMeasuringOnCreate, bool autoCloseIsError, bool logToDefaultLogger = true)
         {
             module = moduleName;
             function = functionName;
