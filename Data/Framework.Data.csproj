@@ -49,12 +49,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Code\**" />
-    <Content Remove="Code\**" />
-    <EmbeddedResource Remove="Code\**" />
-    <None Remove="Code\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentMigrator.Runner" Version="1.6.2" />
