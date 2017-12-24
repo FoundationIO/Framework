@@ -46,9 +46,9 @@ namespace Framework.Infrastructure.Constants
             public const string Info = "INFO";
             public const string Fatal = "FATAL";
             public const string Debug = "DEBUG";
-            public const string SqlBeginTransaction = "SQL-BEGIN-TRANSACTION";
-            public const string SqlCommitTransaction = "SQL-COMMIT-TRANSACTION";
-            public const string SqlRollbackTransaction = "SQL-ROLLBACK-TRANSACTION";
+            public const string SqlBeginTransaction = "TRANS-BEGIN";
+            public const string SqlCommitTransaction = "TRANS-COMMIT";
+            public const string SqlRollbackTransaction = "TRANS-ROLLBACK";
             public const string Sql = "SQL";
             public const string SqlError = "SQL-ERROR";
         }
