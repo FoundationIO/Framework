@@ -266,5 +266,47 @@ namespace Framework.Infrastructure.Utils
         {
             return Guid(value, System.Guid.NewGuid());
         }
+
+        public static DateTime DateTime(string obj, DateTime defaultValue)
+        {
+            if (string.IsNullOrEmpty(obj))
+            {
+                return defaultValue;
+            }
+
+            try
+            {
+                DateTime result;
+                if (System.DateTime.TryParse(obj, out result))
+                    return result;
+                return defaultValue;
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+
+        public static DateTime DateTime(DateTime? obj, DateTime defaultValue)
+        {
+            if (DateUtils.IsValidDate(obj) == false)
+            {
+                return defaultValue;
+            }
+
+            try
+            {
+                return obj.Value;
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+
+        public static DateTime DateTime(string obj)
+        {
+            return DateTime(obj, System.DateTime.MinValue);
+        }
     }
 }
