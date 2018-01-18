@@ -57,6 +57,11 @@ namespace Framework.Infrastructure.Utils
             return CombineInternal(Path.DirectorySeparatorChar, path1, path2, paramstrs);
         }
 
+        public static string GetCurrentDirectory()
+        {
+            return Path.GetFullPath(Directory.GetCurrentDirectory());
+        }
+
         private static string CombineInternal(char slash, string path1, string path2, params string[] paramstrs)
         {
             return string.Format("{0}{1}{2}{3}", path1.RemoveLastChar(slash), slash, path2.RemoveFirstChar(slash), (paramstrs == null || paramstrs.Length == 0) ? string.Empty : PathString(paramstrs, slash));
@@ -72,5 +77,6 @@ namespace Framework.Infrastructure.Utils
 
             return sb.ToString();
         }
+
     }
 }

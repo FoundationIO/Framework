@@ -35,5 +35,15 @@ namespace Framework.Infrastructure.Utils
         {
             return new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, 0);
         }
+
+        public static DateTime UpdateDatePart(this DateTime date, DateTime newDatePart)
+        {
+            return new DateTime(newDatePart.Year, newDatePart.Month, newDatePart.Day, date.Hour, date.Minute, date.Second, date.Millisecond);
+        }
+
+        public static DateTime UpdateDatePart(this DateTime date, int year, int month, int day)
+        {
+            return new DateTime(year, month, day, date.Hour, date.Minute, date.Second, date.Millisecond);
+        }
     }
 }
