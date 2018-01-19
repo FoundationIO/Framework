@@ -77,6 +77,5 @@ namespace Framework.Infrastructure.Utils
 
             return sb.ToString();
         }
-
     }
 }
