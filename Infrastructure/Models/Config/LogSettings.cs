@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 
@@ -6,7 +12,9 @@ namespace Framework.Infrastructure.Models.Config
 {
     public class LogSettings : BaseSettings
     {
-        private Func<string, string> configUpdator;
+#pragma warning disable S1450 // Private fields only used as local variables in methods should become local variables
+        private readonly Func<string, string> configUpdator;
+#pragma warning restore S1450 // Private fields only used as local variables in methods should become local variables
 
         public LogSettings(
                 IConfiguration configuration,

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Framework.Web.Tests
@@ -8,6 +9,7 @@ namespace Framework.Web.Tests
         [TestMethod]
         public void TestMethod1()
         {
+            throw new NotImplementedException();
         }
     }
 }

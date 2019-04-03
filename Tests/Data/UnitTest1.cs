@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Framework.Test.Data
@@ -8,6 +9,7 @@ namespace Framework.Test.Data
         [TestMethod]
         public void TestMethod1()
         {
+            // throw new NotImplementedException();
         }
     }
 }

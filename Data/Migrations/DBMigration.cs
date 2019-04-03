@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator;
@@ -12,22 +18,22 @@ using Framework.Infrastructure.Models.Config;
 
 namespace Framework.Data.Migrations
 {
-    public class DBMigration : IDBMigration
+    public abstract class DBMigration : IDBMigration
     {
-        private ILog log;
-        private IDBInfo dbInfo;
-        private DbSettings dbSettings;
+        private readonly ILog log;
+        private readonly IDBInfo dbInfo;
+        private readonly DbConnectionInfo dbSettings;
 
-        public DBMigration(IBaseConfiguration config , ILog log, IDBInfo dbInfo)
+        protected DBMigration(IBaseConfiguration config , ILog log, IDBInfo dbInfo)
         {
             this.log = log;
             this.dbInfo = dbInfo;
-            dbSettings = config.DbSettings;
+            dbSettings = dbInfo.GetDbSettings();
         }
 
         public bool IsMigrationUptoDate()
         {
-            var announcer = new TextWriterAnnouncer(s => System.Diagnostics.Debug.WriteLine(s));
+            var announcer = new TextWriterAnnouncer(x => System.Diagnostics.Debug.WriteLine(x));
             var assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
 
             var migrationContext = new RunnerContext(announcer)
@@ -77,7 +83,7 @@ namespace Framework.Data.Migrations
         {
             var qry = from a in AppDomain.CurrentDomain.GetAssemblies()
                       from t in a.GetTypes()
-                      where t.Namespace != null ? t.Namespace.ToLower().Equals(migrationNamespace.ToLower().Trim()) : false
+                      where t.Namespace != null && t.Namespace.ToLower().Equals(migrationNamespace.ToLower().Trim())
                       select a;
             return qry.FirstOrDefault();
         }

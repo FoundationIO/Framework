@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -28,7 +34,7 @@ namespace Framework.Utilities.PocoGenerator
         private const string VARIABLECONFIGFILEFOLDER = "{ConfigFolder}";
         private const string VARIABLEEXEFOLDER = "{EXEFolder}";
 
-        private string[] args;
+        private readonly string[] args;
 
         public Config(string[] args)
         {
@@ -43,18 +49,19 @@ namespace Framework.Utilities.PocoGenerator
 
         public string Namespace { get; private set; } = string.Empty;
 
-        public string ClassPrefix { get; private set; } = string.Empty;
+        public string ClassPrefix { get; } = string.Empty;
 
-        public string ClassSuffix { get; private set; } = string.Empty;
+        public string ClassSuffix { get; } = string.Empty;
 
-        public string SchemaName { get; private set; } = null;
+        public string SchemaName { get; } = null;
 
-        public bool IncludeViews { get; private set; } = false;
+        public bool IncludeViews { get; } = false;
 
-        public List<TemplateAndCodeFile> InputOutputFiles { get; private set; } = new List<TemplateAndCodeFile>();
+        public List<TemplateAndCodeFile> InputOutputFiles { get; } = new List<TemplateAndCodeFile>();
 
         public SqlType ServerType
         {
+#pragma warning disable S2372 // Exceptions should not be thrown from property getters
             get
             {
                 if (DbType == null)
@@ -76,23 +83,25 @@ namespace Framework.Utilities.PocoGenerator
                         throw new Exception($"DbType {DbType} is not valid.");
                 }
             }
+#pragma warning restore S2372 // Exceptions should not be thrown from property getters
+
         }
 
         public void Load()
         {
-            if (args.IsParamAvailable(PARAMETERCONFIG) == false)
+            if (!args.IsParamAvailable(PARAMETERCONFIG))
             {
                 throw new Exception("-config configuration option is not specified");
             }
 
-            if (args.IsParamValueAvailable(PARAMETERCONFIG) == false)
+            if (!args.IsParamValueAvailable(PARAMETERCONFIG))
             {
                 throw new Exception("Configuration file is not specified");
             }
 
             ConfigFileLocation = args.GetParamValueAsString(PARAMETERCONFIG);
 
-            if (File.Exists(ConfigFileLocation) == false)
+            if (!File.Exists(ConfigFileLocation))
             {
                 throw new Exception($"Configuration file is not specified from {ConfigFileLocation}");
             }
@@ -129,7 +138,7 @@ namespace Framework.Utilities.PocoGenerator
                     throw new Exception("Template File is not specified in the configuration");
                 }
 
-                if (File.Exists(item.TemplateFile) == false)
+                if (!File.Exists(item.TemplateFile))
                 {
                     throw new Exception("Template File specified in the configuration does not exists");
                 }
@@ -140,7 +149,7 @@ namespace Framework.Utilities.PocoGenerator
                 }
 
                 var codeFileDir = Path.GetDirectoryName(item.CodeFile);
-                if (Directory.Exists(codeFileDir) == false)
+                if (!Directory.Exists(codeFileDir))
                 {
                     try
                     {
@@ -200,8 +209,7 @@ namespace Framework.Utilities.PocoGenerator
             }
 
             str = str.Replace(VARIABLECONFIGFILEFOLDER, Path.GetDirectoryName(ConfigFileLocation));
-            str = str.Replace(VARIABLEEXEFOLDER, Path.GetDirectoryName(Directory.GetCurrentDirectory()));
-            return str;
+            return str.Replace(VARIABLEEXEFOLDER, Path.GetDirectoryName(Directory.GetCurrentDirectory()));
         }
 
         private string SettingsValue(IConfiguration configuration, string sectionString, bool substituteVariables = true)
@@ -212,7 +220,7 @@ namespace Framework.Utilities.PocoGenerator
                 throw new Exception($"Unable find the {sectionString} settings in config file");
             }
 
-            if (section.Value == null || section.Value.Trim() == string.Empty)
+            if (section.Value == null || section.Value.Trim()?.Length == 0)
             {
                 throw new Exception($"Value for {sectionString}  settings is not set in config file");
             }

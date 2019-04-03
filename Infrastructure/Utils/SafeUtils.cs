@@ -1,8 +1,14 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 
 namespace Framework.Infrastructure.Utils
 {
-    public class SafeUtils
+    public static class SafeUtils
     {
         public static int Int(string obj, int defaultValue = 0)
         {
@@ -13,9 +19,11 @@ namespace Framework.Infrastructure.Utils
 
             try
             {
-                int result;
-                if (int.TryParse((string)obj, out result))
+                if (int.TryParse(obj, out int result))
+                {
                     return result;
+                }
+
                 return defaultValue;
             }
             catch (Exception)
@@ -31,9 +39,12 @@ namespace Framework.Infrastructure.Utils
                 return defaultValue;
             }
 
-            var bstr = obj.Trim().ToUpper();
+            string bstr = obj.Trim().ToUpper();
             if ((bstr == "ON") || (bstr == "T") || (bstr == "TRUE") || (bstr == "Y") || (bstr == "YES") || (bstr == "1") || (Int(bstr) > 0))
+            {
                 return true;
+            }
+
             return false;
         }
 
@@ -46,9 +57,11 @@ namespace Framework.Infrastructure.Utils
 
             try
             {
-                var s = obj as string;
-                if (s != null)
+                if (obj is string s)
+                {
                     return Bool(s, defaultValue);
+                }
+
                 return Convert.ToBoolean(obj);
             }
             catch (Exception)
@@ -66,9 +79,11 @@ namespace Framework.Infrastructure.Utils
 
             try
             {
-                ushort result;
-                if (ushort.TryParse((string)obj, out result))
+                if (ushort.TryParse(obj, out ushort result))
+                {
                     return result;
+                }
+
                 return defaultValue;
             }
             catch (Exception)
@@ -120,9 +135,11 @@ namespace Framework.Infrastructure.Utils
 
             try
             {
-                decimal result;
-                if (decimal.TryParse(obj, out result))
+                if (decimal.TryParse(obj, out decimal result))
+                {
                     return result;
+                }
+
                 return defaultValue;
             }
             catch
@@ -167,7 +184,7 @@ namespace Framework.Infrastructure.Utils
 
         public static T Enum<T>(string enumString, object defaultValue)
         {
-            var enumValue = default(T);
+            T enumValue = default(T);
 
             if (!string.IsNullOrEmpty(enumString))
             {
@@ -178,13 +195,17 @@ namespace Framework.Infrastructure.Utils
                 catch (Exception)
                 {
                     if (defaultValue != null)
+                    {
                         enumValue = (T)System.Enum.ToObject(typeof(T), defaultValue);
+                    }
                 }
             }
             else
             {
                 if (defaultValue != null)
+                {
                     enumValue = (T)System.Enum.ToObject(typeof(T), defaultValue);
+                }
             }
 
             return enumValue;
@@ -192,7 +213,7 @@ namespace Framework.Infrastructure.Utils
 
         public static T Enum<T>(int enumValue, object defaultValue)
         {
-            var enumRet = default(T);
+            T enumRet = default(T);
 
             try
             {
@@ -219,13 +240,17 @@ namespace Framework.Infrastructure.Utils
                 catch (Exception)
                 {
                     if (defaultValue != null)
+                    {
                         enumValue = System.Enum.ToObject(enumType, defaultValue);
+                    }
                 }
             }
             else
             {
                 if (defaultValue != null)
+                {
                     enumValue = System.Enum.ToObject(enumType, defaultValue);
+                }
             }
 
             return enumValue;
@@ -251,9 +276,11 @@ namespace Framework.Infrastructure.Utils
         {
             try
             {
-                Guid result;
-                if (System.Guid.TryParse(value, out result))
+                if (System.Guid.TryParse(value, out Guid result))
+                {
                     return result;
+                }
+
                 return defaultValue;
             }
             catch
@@ -276,9 +303,11 @@ namespace Framework.Infrastructure.Utils
 
             try
             {
-                DateTime result;
-                if (System.DateTime.TryParse(obj, out result))
+                if (System.DateTime.TryParse(obj, out DateTime result))
+                {
                     return result;
+                }
+
                 return defaultValue;
             }
             catch
@@ -289,7 +318,7 @@ namespace Framework.Infrastructure.Utils
 
         public static DateTime DateTime(DateTime? obj, DateTime defaultValue)
         {
-            if (DateUtils.IsValidDate(obj) == false)
+            if (!DateUtils.IsValidDate(obj))
             {
                 return defaultValue;
             }

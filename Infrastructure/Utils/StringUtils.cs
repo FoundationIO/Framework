@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -9,29 +15,43 @@ namespace Framework.Infrastructure.Utils
         public static string ToString(this List<string> obj, string sep = " ", bool useNewLine = true)
         {
             if (obj == null)
+            {
                 return string.Empty;
+            }
+
             return ToString((IList<string>)obj.ToArray(), sep, useNewLine);
         }
 
         public static string ToString(this IList<string> obj, string sep = " ", bool useNewLine = true)
         {
             if (obj == null)
+            {
                 return string.Empty;
+            }
+
             return ToString(obj.ToArray(), sep, useNewLine);
         }
 
         public static string ToString(this string[] obj, string sep = " ", bool useNewLine = true)
         {
             if (obj == null)
+            {
                 return string.Empty;
+            }
+
             var sb = new StringBuilder();
             var pos = 0;
             foreach (var item in obj)
             {
                 if (useNewLine)
+                {
                     sb.AppendLine(item + ((pos != obj.Length - 1) ? sep : string.Empty));
+                }
                 else
+                {
                     sb.Append(item + ((pos != obj.Length - 1) ? sep : string.Empty));
+                }
+
                 pos++;
             }
 
@@ -41,7 +61,10 @@ namespace Framework.Infrastructure.Utils
         public static string RemoveLastCharAndAddFirstChar(this string str, char citem)
         {
             if (str.IsNullOrEmpty())
+            {
                 return str;
+            }
+
             str = AddFirstChar(str, citem);
             str = RemoveLastChar(str, citem);
             return str;
@@ -50,34 +73,54 @@ namespace Framework.Infrastructure.Utils
         public static string AddFirstChar(this string str, char citem)
         {
             if (str.IsNullOrEmpty())
+            {
                 return str;
+            }
+
             if (str.FirstChar() != citem.ToString())
+            {
                 str = citem.ToString() + str;
+            }
+
             return str;
         }
 
         public static string RemoveLastChar(this string str, char citem)
         {
             if (str.IsNullOrEmpty())
+            {
                 return str;
+            }
+
             if (str.LastChar() == citem.ToString())
+            {
                 str = str.Substring(0, str.Length - 1);
+            }
+
             return str;
         }
 
         public static string RemoveFirstChar(this string str, char citem)
         {
             if (str.IsNullOrEmpty())
+            {
                 return str;
+            }
+
             if (str.FirstChar() == citem.ToString())
+            {
                 str = str.Substring(1);
+            }
+
             return str;
         }
 
         public static string FlattenString(this string str)
         {
             if (string.IsNullOrEmpty(str))
+            {
                 return string.Empty;
+            }
 
             str = str.Replace('\n', ' ');
             str = str.Replace('\t', ' ');
@@ -88,7 +131,10 @@ namespace Framework.Infrastructure.Utils
         public static string FirstChar(this string str)
         {
             if (str.Length > 0)
+            {
                 return str[0].ToString();
+            }
+
             return string.Empty;
         }
 
@@ -105,14 +151,20 @@ namespace Framework.Infrastructure.Utils
         public static string LastChar(this string str)
         {
             if (str.Length > 0)
+            {
                 return str[str.Length - 1].ToString();
+            }
+
             return string.Empty;
         }
 
         public static bool IsTrimmedStringNullOrEmpty(this string str)
         {
             if (string.IsNullOrEmpty(str))
+            {
                 return true;
+            }
+
             return string.IsNullOrEmpty(str.Trim());
         }
 
@@ -124,10 +176,15 @@ namespace Framework.Infrastructure.Utils
         public static bool IsSameWithCaseIgnoreTrimmed(this string str, string anotherStr)
         {
             if ((str == null) && (anotherStr == null))
+            {
                 return true;
+            }
 
             if ((str == null) || (anotherStr == null))
+            {
                 return false;
+            }
+
             return str.Trim().ToLower() == anotherStr.Trim().ToLower();
         }
     }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using Framework.Infrastructure.Exceptions;
 using Framework.Infrastructure.Models.Search;
@@ -25,12 +31,12 @@ namespace Framework.Infrastructure.Models.Result
         }
 
         public ReturnListWithSearchModel(List<TModel> items, long totalItems)
-            : this((TSearch)null, items, totalItems)
+            : this(null, items, totalItems)
         {
         }
 
         public ReturnListWithSearchModel(List<TModel> items)
-            : this((TSearch)null, items)
+            : this(null, items)
         {
         }
 
@@ -58,12 +64,12 @@ namespace Framework.Infrastructure.Models.Result
         }
 
         public ReturnListWithSearchModel(string errorMsg, Exception ex = null)
-            : this((TSearch)null, errorMsg, ex)
+            : this(null, errorMsg, ex)
         {
         }
 
         public ReturnListWithSearchModel(string errorMsg, List<ErrorItem> errorList)
-            : this((TSearch)null, errorMsg, errorList)
+            : this(null, errorMsg, errorList)
         {
         }
 

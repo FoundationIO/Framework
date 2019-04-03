@@ -1,3 +1,9 @@
+/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,10 +26,10 @@ namespace Framework.Infrastructure.Logging
         private const string PerfFileLayout = "${longdate}\t${event-context:item=app-function}\t${event-context:item=start-time\t${event-context:item=end-time\t${event-context:item=elapsed-time\t${event-context:item=parameters\t${event-context:item=status";
         private const string AppConsoleLayout = "${time} [${event-context:item=severity}] ${message}";
 
-        private LogSettings logConfig;
-        private NLog.Logger logger = null;
-        private NLog.Logger perfLogger = null;
-        private IBaseConfiguration baseConfig;
+        private readonly LogSettings logConfig;
+        private readonly NLog.Logger logger = null;
+        private readonly NLog.Logger perfLogger = null;
+        private readonly IBaseConfiguration baseConfig;
 
         public Log(IBaseConfiguration baseConfig)
         {
@@ -36,10 +42,9 @@ namespace Framework.Infrastructure.Logging
             {
                 var fileTarget = new FileTarget
                 {
-                    FileName = this.logConfig.LogLocation + "/" + baseConfig.AppName + "/AppLogs/${shortdate}.log",
+                    FileName = this.logConfig.LogLocation + Path.DirectorySeparatorChar + baseConfig.AppName + Path.DirectorySeparatorChar + "AppLogs" + Path.DirectorySeparatorChar + "${shortdate}.log",
                     Layout = AppFileLayout,
                     ConcurrentWrites = true,
-
                     ArchiveEvery = FileArchivePeriod.Month,
                     MaxArchiveFiles = 30
                 };
@@ -51,11 +56,9 @@ namespace Framework.Infrastructure.Logging
                 {
                     fileTarget = new FileTarget
                     {
-                        FileName = this.logConfig.LogLocation + "/" + baseConfig.AppName + "/PerfLogs/${shortdate}.log",
-
+                        FileName = this.logConfig.LogLocation + Path.DirectorySeparatorChar + baseConfig.AppName + Path.DirectorySeparatorChar + "PerfLogs" + Path.DirectorySeparatorChar + "${shortdate}.log",
                         Layout = PerfFileLayout,
                         ConcurrentWrites = true,
-
                         ArchiveEvery = FileArchivePeriod.Month,
                         MaxArchiveFiles = 30
                     };
@@ -116,67 +119,89 @@ namespace Framework.Infrastructure.Logging
         public void Trace(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogTrace)
+            {
                 this.LogEvent(Strings.Log.Trace, NLog.LogLevel.Trace, str, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Trace(Exception ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogTrace)
+            {
                 this.LogEvent(Strings.Log.Trace, NLog.LogLevel.Trace, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Debug(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogDebug)
+            {
                 this.LogEvent(Strings.Log.Debug, NLog.LogLevel.Debug, str, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Debug(Exception ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogDebug)
+            {
                 this.LogEvent(Strings.Log.Debug, NLog.LogLevel.Debug, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Info(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogInfo)
+            {
                 this.LogEvent(Strings.Log.Info, NLog.LogLevel.Info, str, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Info(Exception ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogInfo)
+            {
                 this.LogEvent(Strings.Log.Info, NLog.LogLevel.Info, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Warn(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogWarn)
+            {
                 this.LogEvent(Strings.Log.Warning, NLog.LogLevel.Warn, str, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Warn(Exception ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogWarn)
+            {
                 this.LogEvent(Strings.Log.Warning, NLog.LogLevel.Warn, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Error(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogError)
+            {
                 this.LogEvent(Strings.Log.Error, NLog.LogLevel.Error, str, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Error(Exception ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogError)
+            {
                 this.LogEvent(Strings.Log.Error, NLog.LogLevel.Error, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Error(Exception ex, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogError)
+            {
                 this.LogEvent(Strings.Log.Error, NLog.LogLevel.Error, $"Exception - {ex.RecursivelyGetExceptionMessage()}", string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Fatal(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
@@ -197,43 +222,57 @@ namespace Framework.Infrastructure.Logging
         public void SqlBeginTransaction(int count, bool functionCalled, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogSql)
+            {
                 this.LogEvent(Strings.Log.SqlBeginTransaction, NLog.LogLevel.Info, functionCalled ? "Called" : ("Increment Count - " + count.ToString()), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void SqlCommitTransaction(int count, bool functionCalled, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogSql)
+            {
                 this.LogEvent(Strings.Log.SqlCommitTransaction, NLog.LogLevel.Info, functionCalled ? "Called" : (" Decrement Count - " + count.ToString()), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void SqlRollbackTransaction(int count, bool functionCalled, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogSql)
+            {
                 LogEvent(Strings.Log.SqlRollbackTransaction, NLog.LogLevel.Info, functionCalled ? "Called" : (" Decrement Count - " + count.ToString()), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Sql(string sqlStr, string sqlResult, TimeSpan ts, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogSql)
+            {
                 this.LogEvent(Strings.Log.Sql, NLog.LogLevel.Info, sqlStr, (ts.TotalMilliseconds / 1000).ToString(), sqlResult,  sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void SqlError(Exception ex, string sqlStr, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogError)
+            {
                 this.LogEvent(Strings.Log.SqlError, NLog.LogLevel.Error, string.Format("{0} SQL - {1}", ExceptionUtils.RecursivelyGetExceptionMessage(ex), sqlStr), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void SqlError(string sqlStr, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogError)
+            {
                 this.LogEvent(Strings.Log.SqlError, NLog.LogLevel.Info, sqlStr, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         public void Performance(string appModule, string appFunction, DateTime startTime, DateTime endTime, List<KeyValuePair<string,object>> parameters, int statusCode , string status, string additionalMsg, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogPerformance)
+            {
                 this.LogPerfEvent(appModule, appFunction, startTime, endTime, parameters, statusCode, status, additionalMsg, sourceLineNumber, memberName, sourceFilePath);
+            }
         }
 
         private void LogPerfEvent(string appModule, string appFunction, DateTime startTime, DateTime endTime, List<KeyValuePair<string, object>> parameters, int statusCode, string status, string additionalMsg, int sourceLineNumber, string memberName, string sourceFilePath)

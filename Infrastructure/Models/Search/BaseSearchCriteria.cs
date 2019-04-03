@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 
 namespace Framework.Infrastructure.Models.Search
 {
@@ -54,7 +60,9 @@ namespace Framework.Infrastructure.Models.Search
         {
             ValidateMandatoryParams();
             if (TotalRowCount == 0)
+            {
                 return 0;
+            }
 
             int result = (Page - 1) * PageSize;
             return result + 1;
@@ -64,7 +72,9 @@ namespace Framework.Infrastructure.Models.Search
         {
             ValidateMandatoryParams();
             if (TotalRowCount == 0)
+            {
                 return 0;
+            }
 
             int result = ((Page - 1) * PageSize) + CurrentRows;
             return result;
@@ -80,10 +90,15 @@ namespace Framework.Infrastructure.Models.Search
         public int GetSkipValue()
         {
             if (PageSize == 0)
+            {
                 PageSize = 100;
+            }
 
             if (Page == 0)
+            {
                 return 0;
+            }
+
             Page = Page - 1;
             return PageSize * Page;
         }
@@ -91,10 +106,14 @@ namespace Framework.Infrastructure.Models.Search
         private void ValidateMandatoryParams()
         {
             if (TotalRowCount == -1)
+            {
                 throw new Exception("TotalRowCount should be set to the criteria object before sending to the View");
+            }
 
             if (CurrentRows == -1)
+            {
                 throw new Exception("CurrentRows should be set to the criteria object before sending to the View");
+            }
         }
     }
 }

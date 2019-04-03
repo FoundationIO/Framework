@@ -1,4 +1,10 @@
-﻿using System.Linq;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,52 +15,27 @@ namespace Framework.Web.Messages
     {
         public static bool IsErrorMsgSet(this ViewContext helper)
         {
-            if ((helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ErrorMsg)))
-            {
-                return true;
-            }
-
-            return false;
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ErrorMsg));
         }
 
         public static bool IsInfoMsgSet(this ViewContext helper)
         {
-            if ((helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.InfoMsg)))
-            {
-                return true;
-            }
-
-            return false;
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.InfoMsg));
         }
 
         public static bool IsWarningMsgSet(this ViewContext helper)
         {
-            if ((helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.WarningMsg)))
-            {
-                return true;
-            }
-
-            return false;
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.WarningMsg));
         }
 
         public static bool IsSuccessMsgSet(this ViewContext helper)
         {
-            if ((helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.SuccessMsg)))
-            {
-                return true;
-            }
-
-            return false;
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.SuccessMsg));
         }
 
         public static bool IsShowCaptionSet(this ViewContext helper)
         {
-            if ((helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ShowCaption)))
-            {
-                return true;
-            }
-
-            return false;
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ShowCaption));
         }
 
         public static bool IsErrorMsgSet(this IHtmlHelper helper)

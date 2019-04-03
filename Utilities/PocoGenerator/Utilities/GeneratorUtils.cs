@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,37 +12,9 @@ using System.Text.RegularExpressions;
 
 namespace Framework.Utilities.PocoGenerator.Utilities
 {
-    public class GeneratorUtils
+    public static class GeneratorUtils
     {
-        private static Regex rxCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
-
-        private static string[] csKeywords =
-        {
-            "abstract", "event", "new", "struct", "as", "explicit", "null",
-            "switch", "base", "extern", "object", "this", "bool", "false", "operator", "throw",
-            "break", "finally", "out", "true", "byte", "fixed", "override", "try", "case", "float",
-            "params", "typeof", "catch", "for", "private", "uint", "char", "foreach", "protected",
-            "ulong", "checked", "goto", "public", "unchecked", "class", "if", "readonly", "unsafe",
-            "const", "implicit", "ref", "ushort", "continue", "in", "return", "using", "decimal",
-            "int", "sbyte", "virtual", "default", "interface", "sealed", "volatile", "delegate",
-            "internal", "short", "void", "do", "is", "sizeof", "while", "double", "lock",
-            "stackalloc", "else", "long", "static", "enum", "namespace", "string",
-        };
-
-        private static Func<string, string> cleanUp = (str) =>
-        {
-            str = rxCleanUp.Replace(str, "_");
-
-            if (char.IsDigit(str[0]) || csKeywords.Contains(str))
-            {
-                str = "@" + str;
-            }
-
-            str = str.Replace("_", string.Empty);
-            return str;
-        };
-
-        private static Func<string, string> cleanUpTable = (str) =>
+        private static readonly Func<string, string> CleanUpTable = (str) =>
         {
             str = rxCleanUp.Replace(str, "_");
 
@@ -58,19 +36,34 @@ namespace Framework.Utilities.PocoGenerator.Utilities
             return str;
         };
 
+        private static Regex rxCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
+
+        private static string[] csKeywords =
+        {
+            "abstract", "event", "new", "struct", "as", "explicit", "null",
+            "switch", "base", "extern", "object", "this", "bool", "false", "operator", "throw",
+            "break", "finally", "out", "true", "byte", "fixed", "override", "try", "case", "float",
+            "params", "typeof", "catch", "for", "private", "uint", "char", "foreach", "protected",
+            "ulong", "checked", "goto", "public", "unchecked", "class", "if", "readonly", "unsafe",
+            "const", "implicit", "ref", "ushort", "continue", "in", "return", "using", "decimal",
+            "int", "sbyte", "virtual", "default", "interface", "sealed", "volatile", "delegate",
+            "internal", "short", "void", "do", "is", "sizeof", "while", "double", "lock",
+            "stackalloc", "else", "long", "static", "enum", "namespace", "string",
+        };
+
         public static string MakeClassName(string str)
         {
-            return cleanUpTable(GeneratorUtils.Inflector.ToTitleCase(GeneratorUtils.Inflector.MakeSingular(str)));
+            return CleanUpTable(GeneratorUtils.Inflector.ToTitleCase(GeneratorUtils.Inflector.MakeSingular(str)));
         }
 
         public static string MakePropertyName(string str)
         {
-            return cleanUpTable(GeneratorUtils.Inflector.ToTitleCase(str));
+            return CleanUpTable(GeneratorUtils.Inflector.ToTitleCase(str));
         }
 
         public static string GetNullableValueAsString(bool value)
         {
-            if (value == true)
+            if (value)
             {
                 return "true";
             }
@@ -248,8 +241,7 @@ namespace Framework.Utilities.PocoGenerator.Utilities
 
             public static bool IsStringNumeric(string str)
             {
-                double result;
-                return double.TryParse(str, NumberStyles.Float, NumberFormatInfo.CurrentInfo, out result);
+                return double.TryParse(str, NumberStyles.Float, NumberFormatInfo.CurrentInfo, out double result);
             }
 
             public static string UppercaseFirst(string s)

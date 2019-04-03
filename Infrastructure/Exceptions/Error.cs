@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 
 namespace Framework.Infrastructure.Exceptions
@@ -7,14 +13,6 @@ namespace Framework.Infrastructure.Exceptions
     {
         public Error()
         {
-        }
-
-        public Error(string friendlyMessage)
-        {
-            FriendlyMessage = friendlyMessage;
-            InternalErrorMessage = friendlyMessage;
-            ErrorItemList = null;
-            Exception = null;
         }
 
         public Error(string friendlyMessage, string internalErrorMessage = null, List<ErrorItem> errorItemList = null, Exception ex = null)

@@ -1,9 +1,15 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using Framework.Utilities.PocoGenerator.Utilities;
 
 namespace Framework.Utilities.PocoGenerator
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {
@@ -13,12 +19,12 @@ namespace Framework.Utilities.PocoGenerator
                 return -1;
             }
 
-            if (!(args.IsParamValueAvailable("-config") ||
-                    args.IsParamValueAvailable("-new") ||
-                    (args.IsParamValueAvailable("-connectionString") &&
-                     args.IsParamValueAvailable("-dbtype") &&
-                     args.IsParamValueAvailable("-templatefile") &&
-                     args.IsParamValueAvailable("-codefile"))))
+            if (!(args.IsParamValueAvailable("-config")
+                    || args.IsParamValueAvailable("-new")
+                    || (args.IsParamValueAvailable("-connectionString")
+                     && args.IsParamValueAvailable("-dbtype")
+                     && args.IsParamValueAvailable("-templatefile")
+                     && args.IsParamValueAvailable("-codefile"))))
             {
                 PrintUsage();
                 return -1;

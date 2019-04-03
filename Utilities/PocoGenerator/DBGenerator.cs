@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DatabaseSchemaReader;
@@ -10,7 +16,7 @@ namespace Framework.Utilities.PocoGenerator
 {
     public class DbGenerator
     {
-        private Config config;
+        private readonly Config config;
 
         public DbGenerator(Config config)
         {
@@ -73,7 +79,7 @@ namespace Framework.Utilities.PocoGenerator
                     }
 
                     idx++;
-                    tbl.NetName = tbl.NetName + "_" + idx;
+                    tbl.NetName = $"{tbl.NetName}_{idx}";
                 }
 
                 foreach (var view in views)
@@ -88,7 +94,7 @@ namespace Framework.Utilities.PocoGenerator
                     }
 
                     idx++;
-                    view.NetName = view.NetName + "_" + idx;
+                    view.NetName = $"{view.NetName}_{idx}";
                 }
             }
         }
@@ -100,7 +106,7 @@ namespace Framework.Utilities.PocoGenerator
                 col.NetName = GeneratorUtils.MakePropertyName(col.Name);
                 if (col.Table.NetName == col.NetName)
                 {
-                    col.NetName = col.NetName + "2";
+                    col.NetName = $"{col.NetName}2";
                 }
             }
 
@@ -120,7 +126,7 @@ namespace Framework.Utilities.PocoGenerator
                         }
 
                         idx++;
-                        newCol.NetName = newCol.NetName + "_" + idx;
+                        newCol.NetName = "{newCol.NetName}_{idx}";
                     }
                 }
             }

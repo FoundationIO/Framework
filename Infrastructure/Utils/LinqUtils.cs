@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,10 +16,14 @@ namespace Framework.Infrastructure.Utils
         public static IQueryable<T> ApplyPaging<T>(this IQueryable<T> obj, int pageNumber, int pageSize)
         {
             if (pageSize == 0)
+            {
                 pageSize = 100;
+            }
 
             if (pageNumber == 0)
+            {
                 return obj.Take(pageSize);
+            }
 
             pageNumber = pageNumber - 1; //Skip records of previous pages only
             return obj.Skip(pageSize * pageNumber).Take(pageSize);
@@ -22,16 +32,24 @@ namespace Framework.Infrastructure.Utils
         public static void ForEachWithIndex<T>(this IEnumerable<T> enumerable, Action<T, int> handler)
         {
             if (enumerable == null)
+            {
                 return;
+            }
+
             var idx = 0;
             foreach (var item in enumerable)
+            {
                 handler(item, idx++);
+            }
         }
 
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
             if (enumerable == null)
+            {
                 return;
+            }
+
             foreach (var item in enumerable)
             {
                 action(item);

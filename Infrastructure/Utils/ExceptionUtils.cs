@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 
 namespace Framework.Infrastructure.Utils
@@ -8,7 +14,10 @@ namespace Framework.Infrastructure.Utils
         public static string RecursivelyGetExceptionMessage(this Exception ex, bool withStackTrace = true)
         {
             if (ex == null)
+            {
                 return string.Empty;
+            }
+
             var errorList = new List<string>();
             GetInnerExceptionMsg(ex, ref errorList, withStackTrace);
             return StringUtils.ToString(errorList, "\n");
@@ -29,7 +38,9 @@ namespace Framework.Infrastructure.Utils
         {
             errorList.Add(ex.Message + (withStackTrace ? string.Format(" ST - {0}", ex.StackTrace) : string.Empty));
             if (ex.InnerException != null)
+            {
                 GetInnerExceptionMsg(ex.InnerException, ref errorList, withStackTrace);
+            }
         }
     }
 }

@@ -1,4 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Models.Config;
@@ -9,8 +16,9 @@ namespace Framework.Infrastructure.Logging
     public class FrameworkLoggerProvider : ILoggerProvider
     {
         private readonly ConcurrentDictionary<string, FrameworkLogger> loggers = new ConcurrentDictionary<string, FrameworkLogger>();
-        private IBaseConfiguration config;
-        private ILog log;
+        private readonly IBaseConfiguration config;
+        private readonly ILog log;
+        private bool disposed = false;
 
         public FrameworkLoggerProvider(IBaseConfiguration config, ILog log)
         {
@@ -25,6 +33,23 @@ namespace Framework.Infrastructure.Logging
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            // if (disposing)
+            // {
+            // }
+
+            disposed = true;
         }
 
         private FrameworkLogger CreateLoggerImplementation(string name)
@@ -37,7 +62,7 @@ namespace Framework.Infrastructure.Logging
         {
             if (config.LogSettings.OtherFrameworkLogSettings == null
                 || config.LogSettings.OtherFrameworkLogSettings.Count == 0
-                || config.LogSettings.OtherFrameworkLogSettings.Count(x => name.ToLower().Trim().StartsWith(x.Key.ToLower().Trim())) == 0)
+                || !config.LogSettings.OtherFrameworkLogSettings.Any(x => name.ToLower().Trim().StartsWith(x.Key.ToLower().Trim())))
             {
                 if (config.LogSettings.OtherFrameworkLogSettings.Exists(x => x.Key.ToLower().Trim() == "Default".ToLower()))
                 {
@@ -75,12 +100,6 @@ namespace Framework.Infrastructure.Logging
                 case LogLevel.None:
                     return config.LogSettings.NoOpLogSettings();
             }
-        }
-
-        private LogSettings GetDefaultOrNoOpSettings()
-        {
-            // fixme: need to change this
-            return config.LogSettings;
         }
     }
 }

@@ -1,24 +1,29 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 
 namespace Framework.Infrastructure.Logging
 {
     public class PerformanceLog : IDisposable
     {
-        private readonly string module = string.Empty;
-        private readonly string function = string.Empty;
+        private readonly string module;
+        private readonly string function;
+        private readonly bool autoCloseIsError;
+        private readonly ILog log;
         private bool started = false;
-        private bool autoCloseIsError = true;
-        private bool logToDefaultLogger = false;
-        private ILog log;
-        private DateTime startTime, endTime;
+        private DateTime startTime;
+        private bool disposed;
 
         public PerformanceLog(ILog log, string moduleName, string functionName, bool startMeasuringOnCreate, bool autoCloseIsError, bool logToDefaultLogger = true)
         {
             module = moduleName;
             function = functionName;
             this.autoCloseIsError = autoCloseIsError;
-            this.logToDefaultLogger = logToDefaultLogger;
             this.log = log;
             if (startMeasuringOnCreate)
             {
@@ -28,7 +33,7 @@ namespace Framework.Infrastructure.Logging
 
         public void Start()
         {
-            if (started != true)
+            if (!started)
             {
                 startTime = DateTime.Now;
                 started = true;
@@ -45,21 +50,39 @@ namespace Framework.Infrastructure.Logging
             StopAndWriteToLog("Error", additionalMsg);
         }
 
-        void IDisposable.Dispose()
+        public void Dispose()
         {
-            if (started == true)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                if (autoCloseIsError)
-                    StopAndWriteErrorLog();
-                else
-                    StopAndWriteCompleteLog();
+                if (disposing)
+                {
+                    if (started)
+                    {
+                        if (autoCloseIsError)
+                        {
+                            StopAndWriteErrorLog();
+                        }
+                        else
+                        {
+                            StopAndWriteCompleteLog();
+                        }
+                    }
+                }
+
+                disposed = true;
             }
         }
 
         private void StopAndWriteToLog(string status = "completed", string additionalMsg = "")
         {
             started = false;
-            endTime = DateTime.Now;
+            var endTime = DateTime.Now;
             log.Performance(module, function, startTime, endTime, new List<KeyValuePair<string, object>>(), 1, status, additionalMsg);
         }
     }

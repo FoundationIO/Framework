@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using Framework.Infrastructure.Exceptions;
 
@@ -64,7 +70,10 @@ namespace Framework.Infrastructure.Models.Result
         {
             var errorList = new List<ErrorItem>();
             foreach (var msg in errorMsgList)
+            {
                 errorList.Add(new ErrorItem() { Value = msg });
+            }
+
             return new ReturnModel<T>(errorMsg, errorList) { IsSuccess = false };
         }
 

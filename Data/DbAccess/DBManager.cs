@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -6,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Framework.Infrastructure.Config;
+using Framework.Infrastructure.Constants;
 using Framework.Infrastructure.Logging;
 using Framework.Infrastructure.Models.Config;
 using LinqToDB;
@@ -14,26 +21,24 @@ using LinqToDB.DataProvider;
 
 namespace Framework.Data.DbAccess
 {
-    public class DBManager : IDisposable, IDBManager
+    public abstract class DBManager : IDBManager
     {
-        private LogSettings logConfig;
-        private IBaseConfiguration config;
-        private ILog log;
-        private IDBInfo dbInfo;
-        private IDataProvider dbProvider;
+        private readonly LogSettings logConfig;
+        private readonly ILog log;
+        private readonly IDBInfo dbInfo;
         private DataConnection connection = null;
         private DataConnectionTransaction commonTransaction = null;
         private int currentTransactionCount = 0;
+        private bool disposed = false;
 
-        public DBManager(IBaseConfiguration config, ILog log, IDBInfo dbInfo)
+        protected DBManager(IBaseConfiguration config, ILog log, IDBInfo dbInfo)
         {
-            this.config = config;
             this.logConfig = config.LogSettings;
             this.log = log;
             this.dbInfo = dbInfo;
             ConnectionString = dbInfo.GetConnectionString();
-            this.dbProvider = dbInfo.GetDBProvider();
             EnsureOpenConnection();
+            ToggleLogging();
         }
 
         public string ConnectionString { get; set; }
@@ -49,15 +54,14 @@ namespace Framework.Data.DbAccess
 
         public void Dispose()
         {
-            if ((connection != null) && (connection.Connection != null) && (connection.Connection.State == ConnectionState.Open))
-                connection.Close();
-            connection.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public int BeginTransaction()
+        public int BeginTransaction(DBTransactionIsolationLevel dBTransactionIsolationLevel)
         {
             if (currentTransactionCount == 0)
-                commonTransaction = Connection.BeginTransaction();
+                commonTransaction = Connection.BeginTransaction((IsolationLevel)dBTransactionIsolationLevel);
 
             currentTransactionCount++;
             log.SqlBeginTransaction(currentTransactionCount, currentTransactionCount == 0);
@@ -102,10 +106,10 @@ namespace Framework.Data.DbAccess
             return GetTable<T>().Delete(where);
         }
 
-        public void Insert<T>(T obj)
+        public object Insert<T>(T obj)
             where T : class
         {
-            var identityValue = this.Connection.InsertWithIdentity<T>(obj);
+            return this.Connection.InsertWithIdentity<T>(obj);
         }
 
         public void Insert<T>(IEnumerable<T> objs)
@@ -225,15 +229,34 @@ namespace Framework.Data.DbAccess
             }
         }
 
-        private ITable<T> GetTable<T>()
+        public ITable<T> GetTable<T>()
             where T : class
         {
             return Connection.GetTable<T>();
         }
 
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                if ((connection != null) && (connection.Connection?.State == ConnectionState.Open))
+                    connection.Close();
+
+                connection?.Dispose();
+            }
+
+            disposed = true;
+        }
+
         private void ToggleLogging()
         {
+#pragma warning disable S2696 // Instance members should not write to "static" fields
             LinqToDB.Common.Configuration.AvoidSpecificDataProviderAPI = true;
+#pragma warning restore S2696 // Instance members should not write to "static" fields
 
             if (logConfig.LogSql)
             {
@@ -251,7 +274,7 @@ namespace Framework.Data.DbAccess
                     var ptxt = new StringBuilder();
                     foreach (DbParameter param in profiledDbCommand.Parameters)
                     {
-                        ptxt.Append(string.Format("{2} {0} = {1} ", param.ParameterName, param.Value, ptxt.Length > 0 ? "," : string.Empty));
+                        ptxt.AppendFormat("{2} {0} = {1} ", param.ParameterName, param.Value, ptxt.Length > 0 ? "," : string.Empty);
                     }
 
                     var parameterString = ptxt.ToString();
@@ -272,11 +295,10 @@ namespace Framework.Data.DbAccess
         {
             if ((connection == null) || ((connection.Connection == null) || (connection.Connection.State == ConnectionState.Closed || connection.Connection.State == ConnectionState.Broken)))
             {
-                if (connection != null)
-                    connection.Dispose();
+                connection?.Dispose();
                 connection = new DataConnection(dbInfo.GetDBProvider(), ConnectionString)
                 {
-                    CommandTimeout = config.DbSettings.DatabaseCommandTimeout
+                    CommandTimeout = dbInfo.GetDbSettings().DatabaseCommandTimeout
                 };
             }
         }

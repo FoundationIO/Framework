@@ -1,8 +1,17 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
+using System.Linq;
 using System.Threading;
 using FluentMigrator.Runner.Processors;
 using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Constants;
+using Framework.Infrastructure.Models.Config;
+using LinqToDB;
 using LinqToDB.DataProvider;
 using LinqToDB.DataProvider.MySql;
 using LinqToDB.DataProvider.SQLite;
@@ -10,70 +19,106 @@ using LinqToDB.DataProvider.SqlServer;
 
 namespace Framework.Data.DbAccess
 {
-    public class DBInfo : IDBInfo
+    public abstract class DBInfo : IDBInfo
     {
-        private static SqlServerDataProvider sqlServerProvider = new SqlServerDataProvider("default", SqlServerVersion.v2008);
-        private static SQLiteDataProvider sqlite3Provider = new SQLiteDataProvider();
-        private static MySqlDataProvider mySqlProvider = new MySqlDataProvider();
-        private IBaseConfiguration config;
+        private static readonly SqlServerDataProvider SqlServerProvider = new SqlServerDataProvider("default", SqlServerVersion.v2008);
+        private static readonly SQLiteDataProvider Sqlite3Provider = new SQLiteDataProvider(ProviderName.SQLiteClassic);
+        private static readonly MySqlDataProvider MySqlProvider = new MySqlDataProvider();
+        private readonly IBaseConfiguration config;
+        private readonly string profileName;
 
-        public DBInfo(IBaseConfiguration config)
+        protected DBInfo(string profileName, IBaseConfiguration config)
         {
+            this.profileName = profileName;
             this.config = config;
         }
 
-        public virtual string GetConnectionString()
+        public virtual DbConnectionInfo GetDbSettings()
         {
+            return GetDbSettings(profileName);
+        }
+
+        public virtual DbConnectionInfo GetDbSettings(string currentProfile)
+        {
+            if (!config.ConnectionSettings.Keys.Any(x => x == currentProfile))
+            {
+                throw new Exception($"Unable to find DB Provider for the Database Connection profile {currentProfile}");
+            }
+
+            return config.ConnectionSettings[currentProfile];
+        }
+
+        public virtual string GetConnectionString(string currentProfile)
+        {
+            if (!config.ConnectionSettings.Keys.Any(x => x == currentProfile))
+            {
+                throw new Exception($"Unable to find DB Provider for the Database Connection profile {currentProfile}");
+            }
+
+            var dbConnectionInfo = config.ConnectionSettings[currentProfile];
+
             ThreadPool.GetMaxThreads(out int workerThreads, out int completionPortThreads);
 
             var connectionStr = string.Empty;
 
-            var dbType = (config.DbSettings.DatabaseType ?? string.Empty).Trim().ToLower();
+            var dbType = (dbConnectionInfo.DatabaseType ?? string.Empty).Trim().ToLower();
             switch (dbType)
             {
                 case DBType.MYSQL:
                     {
-                        if (config.DbSettings.DatabaseUseIntegratedLogin)
-                            connectionStr = $"IntegratedSecurity=yes;Server={config.DbSettings.DatabaseServer};Database={config.DbSettings.DatabaseName};";
+                        if (dbConnectionInfo.DatabaseUseIntegratedLogin)
+                            connectionStr = $"IntegratedSecurity=yes;Server={dbConnectionInfo.DatabaseServer};Database={dbConnectionInfo.DatabaseName};";
                         else
-                            connectionStr = $"Server={config.DbSettings.DatabaseServer};Database={config.DbSettings.DatabaseName};Uid={config.DbSettings.DatabaseUserName};Pwd={config.DbSettings.DatabasePassword};";
+                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Database={dbConnectionInfo.DatabaseName};Uid={dbConnectionInfo.DatabaseUserName};Pwd={dbConnectionInfo.DatabasePassword};";
                         break;
                     }
 
                 case DBType.SQLSERVER:
                     {
-                        if (config.DbSettings.DatabaseUseIntegratedLogin)
-                            connectionStr = $"Integrated Security=true;Server={config.DbSettings.DatabaseServer};Initial Catalog={config.DbSettings.DatabaseName};Persist Security Info=True;MultipleActiveResultSets =False;Application Name={config.AppName};Max Pool Size={workerThreads};";
+                        if (dbConnectionInfo.DatabaseUseIntegratedLogin)
+                            connectionStr = $"Integrated Security=true;Server={dbConnectionInfo.DatabaseServer};Initial Catalog={dbConnectionInfo.DatabaseName};Persist Security Info=True;MultipleActiveResultSets =False;Application Name={config.AppName};Max Pool Size={workerThreads};";
                         else
-                            connectionStr = $"Server={config.DbSettings.DatabaseServer};Initial Catalog={config.DbSettings.DatabaseName};Persist Security Info=True;User ID={config.DbSettings.DatabaseUserName};Password={config.DbSettings.DatabasePassword};MultipleActiveResultSets=False;Application Name={config.AppName};Max Pool Size={workerThreads};";
+                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Initial Catalog={dbConnectionInfo.DatabaseName};Persist Security Info=True;User ID={dbConnectionInfo.DatabaseUserName};Password={dbConnectionInfo.DatabasePassword};MultipleActiveResultSets=False;Application Name={config.AppName};Max Pool Size={workerThreads};";
                         break;
                     }
 
                 case DBType.SQLITE3:
                     {
-                        connectionStr = $"Data Source={config.DbSettings.DatabaseName}; Version=3;PRAGMA journal_mode=WAL;";
+                        connectionStr = $"Data Source={dbConnectionInfo.DatabaseName};Version=3;PRAGMA journal_mode=WAL;";
                         break;
                     }
 
                 default:
                     {
-                        throw new Exception($"Unable to get Configuration string, Unknown Database type specified in the configuration {config.DbSettings.DatabaseType}");
+                        throw new Exception($"Unable to get Configuration string, Unknown Database type specified in the configuration {dbConnectionInfo.DatabaseType}");
                     }
             }
 
             return connectionStr;
         }
 
+        public virtual string GetConnectionString()
+        {
+            return GetConnectionString(profileName);
+        }
+
         public virtual MigrationProcessorFactory GetMigrationProcessorFactory()
         {
-            var dbType = (config.DbSettings.DatabaseType ?? string.Empty).Trim().ToLower();
+            return GetMigrationProcessorFactory(profileName);
+        }
+
+        public virtual MigrationProcessorFactory GetMigrationProcessorFactory(string currentProfile)
+        {
+            if (!config.ConnectionSettings.Keys.Any(x => x == currentProfile))
+            {
+                throw new Exception($"Unable to find DB Provider for the Database Connection profile {currentProfile}");
+            }
+
+            var dbConnectionInfo = config.ConnectionSettings[currentProfile];
+
+            var dbType = (dbConnectionInfo.DatabaseType ?? string.Empty).Trim().ToLower();
             switch (dbType)
             {
-                case DBType.MYSQL:
-                    {
-                        return new FluentMigrator.Runner.Processors.MySql.MySqlProcessorFactory();
-                    }
-
                 case DBType.SQLSERVER:
                     {
                         return new FluentMigrator.Runner.Processors.SqlServer.SqlServer2008ProcessorFactory();
@@ -84,40 +129,57 @@ namespace Framework.Data.DbAccess
                         return new FluentMigrator.Runner.Processors.SQLite.SQLiteProcessorFactory();
                     }
 
+                case DBType.MYSQL:
+                    {
+                        return new FluentMigrator.Runner.Processors.MySql.MySql5ProcessorFactory();
+                    }
+
                 default:
                     {
-                        throw new Exception($"Unable to get Migration Process Factory, Unknown Database type specified in the configuration {config.DbSettings.DatabaseType}");
+                        throw new Exception($"Unable to get Migration Process Factory, Unknown Database type specified in the configuration {dbConnectionInfo.DatabaseType}");
                     }
             }
         }
 
         public virtual IDataProvider GetDBProvider()
         {
-            var dbType = (config.DbSettings.DatabaseType ?? string.Empty).Trim().ToLower();
+            return GetDBProvider(this.profileName);
+        }
+
+        public virtual IDataProvider GetDBProvider(string currentProfile)
+        {
+            if (!config.ConnectionSettings.Keys.Any(x => x == currentProfile))
+            {
+                throw new Exception($"Unable to find DB Provider for the Database Connection profile {currentProfile}");
+            }
+
+            var dbConnectionInfo = config.ConnectionSettings[currentProfile];
+
+            var dbType = (dbConnectionInfo.DatabaseType ?? string.Empty).Trim().ToLower();
             switch (dbType)
             {
                 case DBType.MYSQL:
                     {
-                        return mySqlProvider;
+                        return MySqlProvider;
                     }
 
                 case DBType.SQLSERVER:
                     {
-                        return sqlServerProvider;
+                        return SqlServerProvider;
                     }
 
                 case DBType.SQLITE3:
                     {
-                        return sqlite3Provider;
+                        return Sqlite3Provider;
                     }
 
                 default:
                     {
-                        throw new Exception($"Unable to get DB Provider, Unknown Database type specified in the configuration {config.DbSettings.DatabaseType}");
+                        throw new Exception($"Unable to get DB Provider, Unknown Database type specified in the configuration {dbConnectionInfo.DatabaseType}");
                     }
             }
 
-            throw new Exception(string.Format("DB Type {0} is not supported yet", config.DbSettings.DatabaseType));
+            throw new Exception(string.Format("DB Type {0} is not supported yet", dbConnectionInfo.DatabaseType));
         }
     }
 }

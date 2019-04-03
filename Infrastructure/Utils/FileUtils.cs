@@ -1,10 +1,16 @@
-﻿using System.IO;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System.IO;
 using System.Reflection;
 using System.Text;
 
 namespace Framework.Infrastructure.Utils
 {
-    public class FileUtils
+    public static class FileUtils
     {
         public static ulong GetDirectorySize(string dir, string filter = "*.*", bool ignoreHiddenFiles = false)
         {
@@ -15,9 +21,10 @@ namespace Framework.Infrastructure.Utils
                 var info = new FileInfo(filename);
                 if (ignoreHiddenFiles)
                 {
-                    //ignore the hidden files
                     if ((info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
+                    {
                         continue;
+                    }
                 }
 
                 size += (ulong)info.Length;

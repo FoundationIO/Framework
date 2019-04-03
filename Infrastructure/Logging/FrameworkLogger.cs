@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using Framework.Infrastructure.Models.Config;
 using Microsoft.Extensions.Logging;
 
@@ -6,8 +12,8 @@ namespace Framework.Infrastructure.Logging
 {
     public class FrameworkLogger : ILogger
     {
-        private LogSettings logConfig;
-        private ILog log;
+        private readonly LogSettings logConfig;
+        private readonly ILog log;
 
         public FrameworkLogger(LogSettings logConfig, ILog log)
         {
@@ -18,11 +24,15 @@ namespace Framework.Infrastructure.Logging
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (!IsEnabled(logLevel))
+            {
                 return;
+            }
 
             var message = formatter(state, exception);
             if (string.IsNullOrEmpty(message))
+            {
                 return;
+            }
 
             switch (logLevel)
             {

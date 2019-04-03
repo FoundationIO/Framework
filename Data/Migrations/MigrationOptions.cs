@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator;
@@ -17,6 +23,6 @@ namespace Framework.Data.Migrations
 
         public string ProviderSwitches { get; set; }
 
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
     }
 }

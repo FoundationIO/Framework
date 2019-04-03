@@ -1,24 +1,32 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Framework.Infrastructure.Constants;
 using LinqToDB;
 using LinqToDB.Data;
 
 namespace Framework.Data.DbAccess
 {
-    public interface IDBManager
+    public interface IDBManager : IDisposable
     {
         string ConnectionString { get; set; }
 
         DataConnection Connection { get; }
 
-        int BeginTransaction();
+        int BeginTransaction(DBTransactionIsolationLevel dBTransactionIsolationLevel);
 
         int CommitTransaction();
 
-        void Dispose();
-
         int RollbackTransaction();
+
+        ITable<T> GetTable<T>()
+            where T : class;
 
         long Count<T>()
             where T : class;
@@ -41,7 +49,7 @@ namespace Framework.Data.DbAccess
         void Insert<T>(IEnumerable<T> objs)
             where T : class;
 
-        void Insert<T>(T obj)
+        object Insert<T>(T obj)
             where T : class;
 
         void InsertAll<T>(List<T> list)

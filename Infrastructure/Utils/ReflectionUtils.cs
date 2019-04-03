@@ -1,16 +1,25 @@
-﻿using System;
+﻿/**
+Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights reserved.
+
+This work is licensed under the terms of the BSD license.
+For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
+**/
+using System;
 using System.Reflection;
 
 namespace Framework.Infrastructure.Utils
 {
-    public class ReflectionUtils
+    public static class ReflectionUtils
     {
         public static void SetPropertyValueFromString(object target, PropertyInfo prop, string value, object defaultValue)
         {
             if (value == null)
             {
                 if (defaultValue != null)
+                {
                     prop.SetValue(target, defaultValue, null);
+                }
+
                 return;
             }
 
@@ -59,24 +68,35 @@ namespace Framework.Infrastructure.Utils
                 var propType = prop.PropertyType;
                 var safeValue = SafeUtils.Enum(propType, value, null);
                 if (safeValue != null)
+                {
                     prop.SetValue(target, safeValue, null);
+                }
             }
         }
 
         public static T GetPrivatePropertyValue<T>(object obj, string propName)
         {
             if (obj == null)
+            {
                 throw new ArgumentNullException("obj");
+            }
+
             PropertyInfo pi = obj.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (pi == null)
+            {
                 throw new ArgumentOutOfRangeException("propName", string.Format("Property {0} was not found in Type {1}", propName, obj.GetType().FullName));
+            }
+
             return (T)pi.GetValue(obj, null);
         }
 
         public static T GetPrivateFieldValue<T>(object obj, string propName)
         {
             if (obj == null)
+            {
                 throw new ArgumentNullException("obj");
+            }
+
             Type t = obj.GetType();
             FieldInfo fi = null;
             while (fi == null && t != null)
@@ -86,7 +106,10 @@ namespace Framework.Infrastructure.Utils
             }
 
             if (fi == null)
+            {
                 throw new ArgumentOutOfRangeException("propName", string.Format("Field {0} was not found in Type {1}", propName, obj.GetType().FullName));
+            }
+
             return (T)fi.GetValue(obj);
         }
 
@@ -94,14 +117,20 @@ namespace Framework.Infrastructure.Utils
         {
             Type t = obj.GetType();
             if (t.GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) == null)
+            {
                 throw new ArgumentOutOfRangeException("propName", string.Format("Property {0} was not found in Type {1}", propName, obj.GetType().FullName));
+            }
+
             t.InvokeMember(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.SetProperty | BindingFlags.Instance, null, obj, new object[] { val });
         }
 
         public static void SetPrivateFieldValue<T>(object obj, string propName, T val)
         {
             if (obj == null)
+            {
                 throw new ArgumentNullException("obj");
+            }
+
             Type t = obj.GetType();
             FieldInfo fi = null;
             while (fi == null && t != null)
@@ -111,7 +140,10 @@ namespace Framework.Infrastructure.Utils
             }
 
             if (fi == null)
+            {
                 throw new ArgumentOutOfRangeException("propName", string.Format("Field {0} was not found in Type {1}", propName, obj.GetType().FullName));
+            }
+
             fi.SetValue(obj, val);
         }
     }
