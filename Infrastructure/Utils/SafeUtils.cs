@@ -184,7 +184,7 @@ namespace Framework.Infrastructure.Utils
 
         public static T Enum<T>(string enumString, object defaultValue)
         {
-            T enumValue = default(T);
+            T enumValue = default;
 
             if (!string.IsNullOrEmpty(enumString))
             {
@@ -213,8 +213,7 @@ namespace Framework.Infrastructure.Utils
 
         public static T Enum<T>(int enumValue, object defaultValue)
         {
-            T enumRet = default(T);
-
+            T enumRet;
             try
             {
                 enumRet = (T)System.Enum.ToObject(typeof(T), enumValue);
@@ -258,18 +257,14 @@ namespace Framework.Infrastructure.Utils
 
         public static object Enum(Type enumType, int enumValue, object defaultValue)
         {
-            object enumRet = null;
-
             try
             {
-                enumRet = System.Enum.ToObject(enumType, enumValue);
+                return System.Enum.ToObject(enumType, enumValue);
             }
             catch (Exception)
             {
-                enumRet = System.Enum.ToObject(enumType, defaultValue);
+                return System.Enum.ToObject(enumType, defaultValue);
             }
-
-            return enumRet;
         }
 
         public static Guid Guid(string value, System.Guid defaultValue)

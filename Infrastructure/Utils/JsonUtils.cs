@@ -4,8 +4,7 @@ Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights r
 This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
 
 namespace Framework.Infrastructure.Utils
 {
@@ -13,19 +12,17 @@ namespace Framework.Infrastructure.Utils
     {
         public static T Deserialize<T>(string jsonStr)
         {
-            return JsonConvert.DeserializeObject<T>(jsonStr);
+            return JsonSerializer.Deserialize<T>(jsonStr);
         }
 
-        public static string Serialize(object obj)
+        public static string Serialize<T>(T obj, bool formatted = false)
         {
-            ITraceWriter traceWriter = new MemoryTraceWriter();
-
-            return JsonConvert.SerializeObject(obj, Formatting.None, new JsonSerializerSettings
-                {
-                    TraceWriter = traceWriter,
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    NullValueHandling = NullValueHandling.Ignore
-                });
+            return JsonSerializer.Serialize<T>(obj, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IgnoreNullValues = true,
+                WriteIndented = formatted
+            });
         }
     }
 }

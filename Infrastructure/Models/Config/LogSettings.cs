@@ -12,18 +12,13 @@ namespace Framework.Infrastructure.Models.Config
 {
     public class LogSettings : BaseSettings
     {
-#pragma warning disable S1450 // Private fields only used as local variables in methods should become local variables
-        private readonly Func<string, string> configUpdator;
-#pragma warning restore S1450 // Private fields only used as local variables in methods should become local variables
-
         public LogSettings(
                 IConfiguration configuration,
                 List<KeyValuePair<string, Microsoft.Extensions.Logging.LogLevel>> otherFrameworkLogSettings,
-                Func<string,string> configUpdator)
+                Func<string, string> configUpdator)
             : base(configuration, configUpdator)
         {
             OtherFrameworkLogSettings = otherFrameworkLogSettings;
-            this.configUpdator = configUpdator;
         }
 
         //log related
@@ -48,6 +43,18 @@ namespace Framework.Infrastructure.Models.Config
         public bool LogToConsole { get; private set; }
 
         public bool LogToDebugger { get; private set; }
+
+        public bool LogToServer { get; private set; }
+
+        public bool LogServerHost { get; private set; }
+
+        public bool LogServerPort { get; private set; }
+
+        public bool LogServerUserName { get; private set; }
+
+        public bool LogServerPassword { get; private set; }
+
+        public bool LogServerAccessKey { get; private set; }
 
         public List<KeyValuePair<string, Microsoft.Extensions.Logging.LogLevel>> OtherFrameworkLogSettings { get; private set; }
 

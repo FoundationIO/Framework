@@ -16,9 +16,9 @@ namespace Framework.Utilities.PocoGenerator.Utilities
     {
         private static readonly Func<string, string> CleanUpTable = (str) =>
         {
-            str = rxCleanUp.Replace(str, "_");
+            str = RxCleanUp.Replace(str, "_");
 
-            if (char.IsDigit(str[0]) || csKeywords.Contains(str))
+            if (char.IsDigit(str[0]) || CsKeywords.Contains(str))
             {
                 str = "@" + str;
             }
@@ -36,9 +36,9 @@ namespace Framework.Utilities.PocoGenerator.Utilities
             return str;
         };
 
-        private static Regex rxCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
+        private static readonly Regex RxCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
 
-        private static string[] csKeywords =
+        private static readonly string[] CsKeywords =
         {
             "abstract", "event", "new", "struct", "as", "explicit", "null",
             "switch", "base", "extern", "object", "this", "bool", "false", "operator", "throw",
@@ -92,8 +92,7 @@ namespace Framework.Utilities.PocoGenerator.Utilities
             }
 
             string typePrecisionStr = type.Substring(startPos + 1, endPos - startPos - 1);
-            int result = -1;
-            if (int.TryParse(typePrecisionStr, out result))
+            if (int.TryParse(typePrecisionStr, out int result))
             {
                 return result;
             }
@@ -105,8 +104,7 @@ namespace Framework.Utilities.PocoGenerator.Utilities
 
         public static int GetDatatypeSize(string type)
         {
-            int result = -1;
-            if (int.TryParse(type, out result))
+            if (int.TryParse(type, out int result))
             {
                 return result;
             }
@@ -241,7 +239,7 @@ namespace Framework.Utilities.PocoGenerator.Utilities
 
             public static bool IsStringNumeric(string str)
             {
-                return double.TryParse(str, NumberStyles.Float, NumberFormatInfo.CurrentInfo, out double result);
+                return double.TryParse(str, NumberStyles.Float, NumberFormatInfo.CurrentInfo, out _);
             }
 
             public static string UppercaseFirst(string s)

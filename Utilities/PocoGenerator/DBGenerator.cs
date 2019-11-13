@@ -4,6 +4,7 @@ Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights r
 This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,12 +26,16 @@ namespace Framework.Utilities.PocoGenerator
 
         public DatabaseSchema GetSchema()
         {
+            DatabaseSchema schema;
+
 #if NET461
-            var dbReader = new DatabaseReader(config.ConnectionString, config.ServerType);
+            using (var dbReader = new DatabaseReader(config.ConnectionString, config.ServerType))
 #else
-            var dbReader = new DatabaseReader(config.GetConnection());
+            using (var dbReader = new DatabaseReader(config.GetConnection()))
 #endif
-            var schema = dbReader.ReadAll();
+            {
+                schema = dbReader.ReadAll();
+            }
 
             // Fix all the names of the Views and Tables then proceed to check for duplicates
             foreach (var tbl in schema.Tables)
@@ -54,6 +59,24 @@ namespace Framework.Utilities.PocoGenerator
             foreach (var vw in schema.Views)
             {
                 FixTableAndViewName(vw.NetName, schema.Tables, schema.Views);
+            }
+
+            foreach (var tbl in schema.Tables)
+            {
+                if (!config.IgnoredTableNames.Contains(tbl.Name.Trim().ToUpper()))
+                    continue;
+
+                tbl.Name = "";
+                tbl.NetName = "";
+            }
+
+            foreach (var vw in schema.Views)
+            {
+                if (!config.IgnoredTableNames.Contains(vw.Name.Trim().ToUpper()))
+                    continue;
+
+                vw.Name = "";
+                vw.NetName = "";
             }
 
             return schema;
@@ -139,8 +162,10 @@ namespace Framework.Utilities.PocoGenerator
 
             foreach (var item in config.InputOutputFiles)
             {
-                var fac = new EngineFactory();
-                var engine = fac.ForFileSystem(Path.GetDirectoryName(item.TemplateFile));
+                var engine = new RazorLightEngineBuilder()
+                                .UseFileSystemProject(Path.GetDirectoryName(item.TemplateFile),Path.GetExtension(item.TemplateFile))
+                                .UseMemoryCachingProvider()
+                                .Build();
                 string result = engine.CompileRenderAsync(Path.GetFileName(item.TemplateFile), model).Result;
                 File.WriteAllText(item.CodeFile, result);
             }

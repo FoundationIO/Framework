@@ -4,8 +4,10 @@ Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights r
 This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
+using System;
 using System.Collections.Generic;
 using Framework.Infrastructure.Models.Config;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Framework.Infrastructure.Config
 {
@@ -13,10 +15,55 @@ namespace Framework.Infrastructure.Config
     {
         string AppName { get; }
 
+        string ApplicationVersion { get; set; }
+
+        string DatabaseVersion { get; set; }
+
+        bool EnableNewFeatures { get; }
+
         LogSettings LogSettings { get; }
 
         Dictionary<string, DbConnectionInfo> ConnectionSettings { get; }
 
-        // DbSettings DbSettings { get; }
+        int CacheHighRefreshInMinutes { get; }
+
+        int CachMediumRefreshInMinutes { get; }
+
+        int CachLowRefreshInMinutes { get; }
+
+        DistributedCacheEntryOptions CacheHighRefreshOption()
+        {
+            var time = CacheHighRefreshInMinutes;
+            if (time == 0)
+                time = 5;
+            return new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = new TimeSpan(0, time, 0)
+            };
+        }
+
+        DistributedCacheEntryOptions CachMediumRefreshOption()
+        {
+            var time = CachMediumRefreshInMinutes;
+            if (time == 0)
+                time = 5;
+
+            return new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = new TimeSpan(0, time, 0)
+            };
+        }
+
+        DistributedCacheEntryOptions CachLowRefreshOption()
+        {
+            var time = CachLowRefreshInMinutes;
+            if (time == 0)
+                time = 5;
+
+            return new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = new TimeSpan(0, time, 0)
+            };
+        }
     }
 }

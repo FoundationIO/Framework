@@ -17,7 +17,7 @@ namespace Framework.Web.Messages
 
         public static HtmlString DisplayMsg(string msgType, string caption, string msg, bool canHide)
         {
-            return new HtmlString(string.Format("<p class=\"flash {0}\"> {1} </p>", msgType, msg));
+            return new HtmlString($"<p class=\"flash caption =\"{caption}\" canHide = \"{canHide}\" {msgType}\"> {msg} </p>");
         }
 
         public static HtmlString DisplayInfoMsg(string caption, string infoMsg, bool canHide)

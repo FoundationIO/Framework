@@ -4,16 +4,8 @@ Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights r
 This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
-using System;
-using System.Linq;
-using System.Reflection;
+#pragma warning disable CS0612 // Type or member is obsolete
 using FluentMigrator;
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Initialization;
-using Framework.Data.DbAccess;
-using Framework.Infrastructure.Config;
-using Framework.Infrastructure.Logging;
 
 namespace Framework.Data.Migrations
 {
@@ -26,3 +18,4 @@ namespace Framework.Data.Migrations
         public int? Timeout { get; set; }
     }
 }
+#pragma warning restore CS0612 // Type or member is obsolete

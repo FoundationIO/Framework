@@ -6,6 +6,7 @@ For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Framework.Infrastructure.Logging
 {
@@ -15,6 +16,7 @@ namespace Framework.Infrastructure.Logging
         private readonly string function;
         private readonly bool autoCloseIsError;
         private readonly ILog log;
+        private readonly bool logToDefaultLogger;
         private bool started = false;
         private DateTime startTime;
         private bool disposed;
@@ -25,6 +27,7 @@ namespace Framework.Infrastructure.Logging
             function = functionName;
             this.autoCloseIsError = autoCloseIsError;
             this.log = log;
+            this.logToDefaultLogger = logToDefaultLogger;
             if (startMeasuringOnCreate)
             {
                 Start();
@@ -40,14 +43,14 @@ namespace Framework.Infrastructure.Logging
             }
         }
 
-        public void StopAndWriteCompleteLog(string additionalMsg = "")
+        public void StopAndWriteCompleteLog(string additionalMsg = "", [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
-            StopAndWriteToLog("Completed", additionalMsg);
+            StopAndWriteToLog("Completed", additionalMsg, sourceLineNumber, memberName, sourceFilePath);
         }
 
-        public void StopAndWriteErrorLog(string additionalMsg = "")
+        public void StopAndWriteErrorLog(string additionalMsg = "", [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
-            StopAndWriteToLog("Error", additionalMsg);
+            StopAndWriteToLog("Error", additionalMsg, sourceLineNumber, memberName, sourceFilePath);
         }
 
         public void Dispose()
@@ -79,11 +82,16 @@ namespace Framework.Infrastructure.Logging
             }
         }
 
-        private void StopAndWriteToLog(string status = "completed", string additionalMsg = "")
+        private void StopAndWriteToLog(string status = "completed", string additionalMsg = "", [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             started = false;
             var endTime = DateTime.Now;
-            log.Performance(module, function, startTime, endTime, new List<KeyValuePair<string, object>>(), 1, status, additionalMsg);
+            if (logToDefaultLogger)
+            {
+                log.Info($"Module = {module} , Function = {function}  , startTime  =  {startTime} , endTime = {endTime} , additionalMsg = {additionalMsg}", sourceLineNumber, memberName, sourceFilePath);
+            }
+
+            log.Performance(module, function, startTime, endTime, new List<KeyValuePair<string, object>>(), 1, status, additionalMsg, sourceLineNumber, memberName, sourceFilePath);
         }
     }
 }

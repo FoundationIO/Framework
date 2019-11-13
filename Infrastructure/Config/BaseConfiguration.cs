@@ -26,12 +26,24 @@ namespace Framework.Infrastructure.Config
         //General App Related
         public string AppName { get; set; } = null;
 
+        public string ApplicationVersion { get; set; } = "";
+
+        public string DatabaseVersion { get; set; } = "";
+
+        public bool EnableNewFeatures { get; private set; } = true;
+
         public Dictionary<string, DbConnectionInfo> ConnectionSettings { get; private set; }
 
         // public DbSettings DbSettings { get; private set; }
 
         // log related
         public LogSettings LogSettings { get; private set; }
+
+        public int CacheHighRefreshInMinutes { get; private set; }
+
+        public int CachMediumRefreshInMinutes { get; private set; }
+
+        public int CachLowRefreshInMinutes { get; private set; }
 
         protected void PrepareFolders()
         {
@@ -80,6 +92,7 @@ namespace Framework.Infrastructure.Config
                     str = str.Replace(Strings.Config.ConfigPath, FileUtils.GetFileDirectory(configLocation));
                     str = Path.GetFullPath(new Uri(str).LocalPath);
                 }
+
                 return str;
             });
 

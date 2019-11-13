@@ -19,12 +19,12 @@ namespace Framework.Utilities.PocoGenerator
                 return -1;
             }
 
-            if (!(args.IsParamValueAvailable("-config")
-                    || args.IsParamValueAvailable("-new")
-                    || (args.IsParamValueAvailable("-connectionString")
-                     && args.IsParamValueAvailable("-dbtype")
-                     && args.IsParamValueAvailable("-templatefile")
-                     && args.IsParamValueAvailable("-codefile"))))
+            if (!(args.IsParamValueAvailable("--config")
+                    || args.IsParamValueAvailable("--new")
+                    || (args.IsParamValueAvailable("--connectionString")
+                     && args.IsParamValueAvailable("--dbtype")
+                     && args.IsParamValueAvailable("--templatefile")
+                     && args.IsParamValueAvailable("--codefile"))))
             {
                 PrintUsage();
                 return -1;

@@ -4,6 +4,8 @@ Copyright (c) 2016 Foundation.IO (https://github.com/foundationio). All rights r
 This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
+#pragma warning disable CS0612 // Type or member is obsolete
+
 using System;
 using System.Linq;
 using System.Threading;
@@ -11,7 +13,6 @@ using FluentMigrator.Runner.Processors;
 using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Constants;
 using Framework.Infrastructure.Models.Config;
-using LinqToDB;
 using LinqToDB.DataProvider;
 using LinqToDB.DataProvider.MySql;
 using LinqToDB.DataProvider.SQLite;
@@ -22,7 +23,7 @@ namespace Framework.Data.DbAccess
     public abstract class DBInfo : IDBInfo
     {
         private static readonly SqlServerDataProvider SqlServerProvider = new SqlServerDataProvider("default", SqlServerVersion.v2008);
-        private static readonly SQLiteDataProvider Sqlite3Provider = new SQLiteDataProvider(ProviderName.SQLiteClassic);
+        private static readonly SQLiteDataProvider Sqlite3Provider = new SQLiteDataProvider();
         private static readonly MySqlDataProvider MySqlProvider = new MySqlDataProvider();
         private readonly IBaseConfiguration config;
         private readonly string profileName;
@@ -84,7 +85,7 @@ namespace Framework.Data.DbAccess
 
                 case DBType.SQLITE3:
                     {
-                        connectionStr = $"Data Source={dbConnectionInfo.DatabaseName};Version=3;PRAGMA journal_mode=WAL;";
+                        connectionStr = $"Data Source={dbConnectionInfo.DatabaseName}";
                         break;
                     }
 
@@ -183,3 +184,5 @@ namespace Framework.Data.DbAccess
         }
     }
 }
+
+#pragma warning restore CS0612 // Type or member is obsolete

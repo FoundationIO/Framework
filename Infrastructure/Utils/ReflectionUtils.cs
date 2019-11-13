@@ -146,5 +146,67 @@ namespace Framework.Infrastructure.Utils
 
             fi.SetValue(obj, val);
         }
+
+        public static T GetValueFromString<T>(string value, T defaultValue)
+        {
+            if (value == null)
+            {
+                return defaultValue;
+            }
+
+            var ptype = typeof(T);
+
+            if (ptype == typeof(string))
+            {
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            else if (ptype == typeof(short))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Short(value), typeof(T));
+            }
+            else if (ptype == typeof(ushort))
+            {
+                return (T)Convert.ChangeType(SafeUtils.UShort(value), typeof(T));
+            }
+            else if (ptype == typeof(int))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Int(value), typeof(T));
+            }
+            else if (ptype == typeof(long))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Long(value), typeof(T));
+            }
+            else if (ptype == typeof(float))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Float(value), typeof(T));
+            }
+            else if (ptype == typeof(double))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Double(value), typeof(T));
+            }
+            else if (ptype == typeof(bool))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Bool(value), typeof(T));
+            }
+            else if (ptype == typeof(Guid))
+            {
+                return (T)Convert.ChangeType(SafeUtils.Guid(value), typeof(T));
+            }
+            else if (ptype == typeof(Enum))
+            {
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+            else if (ptype.GetTypeInfo().BaseType == typeof(Enum))
+            {
+                var propType = ptype;
+                var safeValue = SafeUtils.Enum(propType, value, null);
+                if (safeValue != null)
+                {
+                    return (T)Convert.ChangeType(safeValue, typeof(T));
+                }
+            }
+
+            return defaultValue;
+        }
     }
 }

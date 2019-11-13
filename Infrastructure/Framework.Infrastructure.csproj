@@ -1,49 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>Framework.Infrastructure</AssemblyName>
     <OutputTypeEx>library</OutputTypeEx>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <NoWarn>1591</NoWarn>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <NoWarn>1591</NoWarn>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
-    <PackageReference Include="NLog" Version="5.0.0-beta11" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.12.0.8217">
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.0.0" />
+    <PackageReference Include="SecurityCodeScan" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Device" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+    <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
+    <PackageReference Include="System.Security.Principal" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0" />
+    <PackageReference Include="NLog" Version="5.0.0-beta11" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.0.0.9566">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\Framework.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+
 </Project>

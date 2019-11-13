@@ -25,7 +25,7 @@ namespace Framework.Infrastructure.Utils
                 return obj.Take(pageSize);
             }
 
-            pageNumber = pageNumber - 1; //Skip records of previous pages only
+            pageNumber -= 1; //Skip records of previous pages only
             return obj.Skip(pageSize * pageNumber).Take(pageSize);
         }
 
@@ -80,6 +80,25 @@ namespace Framework.Infrastructure.Utils
         public static Expression<Func<T, bool>> False<T>()
         {
             return f => false;
+        }
+
+        public static Expression<Func<T, TType>> FuncToExpression<T, TType>(Func<T, TType> f)
+        {
+            return x => f(x);
+        }
+
+        public static Expression<Func<T, bool>> AddFilterToStringProperty<T>(Expression<Func<T, string>> expression, string filter, string fiterFunctionName)
+        {
+            var notNullExpresion = Expression.NotEqual(expression.Body,Expression.Constant(null));
+
+            var methodExpresion = Expression.Call(
+                    expression.Body,
+                    fiterFunctionName,
+                    null,
+                    Expression.Constant(filter));
+
+            var filterExpresion = Expression.AndAlso(notNullExpresion, methodExpresion);
+            return Expression.Lambda<Func<T, bool>>(filterExpresion, expression.Parameters);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Framework.Infrastructure.Models.Result
         <TModel, BaseSearchCriteria>
     {
         public ReturnListModel(List<TModel> items, long totalItems)
-            : base(null,items, totalItems)
+            : base(null, items, totalItems)
         {
         }
 
@@ -34,34 +34,39 @@ namespace Framework.Infrastructure.Models.Result
         {
         }
 
-        public ReturnListModel(string errorMsg, List<ErrorItem> errorList)
+        public ReturnListModel(string errorMsg, List<ReturnErrorItem> errorList)
             : base(errorMsg, errorList)
         {
         }
 
-        public static new ReturnListModel<TModel> Success(List<TModel> objList)
+        public static new ReturnListModel<TModel> Success(List<TModel> objList, string sucessMessage = null)
         {
-            return new ReturnListModel<TModel>(objList) { IsSuccess = true };
+            return new ReturnListModel<TModel>(objList) { IsSuccess = true , SuccessMessage = sucessMessage };
         }
 
-        public static new ReturnListModel<TModel> Success(List<TModel> objList, long totalItems)
+        public static new ReturnListModel<TModel> Success(List<TModel> objList, long totalItems, string sucessMessage = null)
         {
-            return new ReturnListModel<TModel>(objList, totalItems) { IsSuccess = true };
+            return new ReturnListModel<TModel>(objList, totalItems) { IsSuccess = true, SuccessMessage = sucessMessage };
         }
 
-        public static new ReturnListModel<TModel> Error(Exception ex)
+        public static new ReturnListModel<TModel> Error(Exception ex, int httpCode = 200)
         {
-            return new ReturnListModel<TModel>(ex) { IsSuccess = false };
+            return new ReturnListModel<TModel>(ex) { IsSuccess = false, HttpCode = httpCode };
         }
 
-        public static new ReturnListModel<TModel> Error(string errorMsg, Exception ex = null)
+        public static new ReturnListModel<TModel> Error(string errorMsg, int httpCode = 200)
         {
-            return new ReturnListModel<TModel>(errorMsg, ex) { IsSuccess = false };
+            return new ReturnListModel<TModel>(errorMsg) { IsSuccess = false, HttpCode = httpCode };
         }
 
-        public static new ReturnListModel<TModel> Error(string errorMsg, List<ErrorItem> errorList)
+        public static new ReturnListModel<TModel> Error(string errorMsg, Exception ex = null, int httpCode = 200)
         {
-            return new ReturnListModel<TModel>(errorMsg, errorList) { IsSuccess = false };
+            return new ReturnListModel<TModel>(errorMsg, ex) { IsSuccess = false, HttpCode = httpCode };
+        }
+
+        public static new ReturnListModel<TModel> Error(string errorMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
+        {
+            return new ReturnListModel<TModel>(errorMsg, errorList) { IsSuccess = false, HttpCode = httpCode };
         }
     }
 }

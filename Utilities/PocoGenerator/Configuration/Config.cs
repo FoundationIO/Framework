@@ -18,11 +18,11 @@ namespace Framework.Utilities.PocoGenerator
 {
     public class Config
     {
-        private const string MSSQLDBTYPE = "mssql";
+        private const string MSSQLDBTYPE = "sqlserver";
         private const string MYSQLDBTYPE = "mysql";
         private const string SQLITE3DBTYPE = "sqlite3";
 
-        private const string PARAMETERCONFIG = "-config";
+        private const string PARAMETERCONFIG = "--config";
 
         private const string SECTIONCONNECTIONSTRING = "connectionString";
         private const string SECTIONNAMESPACE = "nameSpace";
@@ -30,6 +30,8 @@ namespace Framework.Utilities.PocoGenerator
         private const string SECTIONCODEFILENAME = "codeFileName";
         private const string SECTIONTEMPLATEFILENAME = "templateFileName";
         private const string SECTIONGENERATE = "generate";
+        private const string SECTIONIGNOREDTABLES = "ignoredTableNames";
+        private const string SECTIONINBUILTSCHEMA = "inbuiltSchema";
 
         private const string VARIABLECONFIGFILEFOLDER = "{ConfigFolder}";
         private const string VARIABLEEXEFOLDER = "{EXEFolder}";
@@ -57,6 +59,10 @@ namespace Framework.Utilities.PocoGenerator
 
         public bool IncludeViews { get; } = false;
 
+        public List<string> IgnoredTableNames { get; } = new List<string>();
+
+        public List<string> InbuiltSchema { get; } = new List<string>();
+
         public List<TemplateAndCodeFile> InputOutputFiles { get; } = new List<TemplateAndCodeFile>();
 
         public SqlType ServerType
@@ -75,10 +81,13 @@ namespace Framework.Utilities.PocoGenerator
                 {
                     case MSSQLDBTYPE:
                         return SqlType.SqlServer;
+
                     case MYSQLDBTYPE:
                         return SqlType.MySql;
+
                     case SQLITE3DBTYPE:
                         return SqlType.SQLite;
+
                     default:
                         throw new Exception($"DbType {DbType} is not valid.");
                 }
@@ -100,14 +109,13 @@ namespace Framework.Utilities.PocoGenerator
             }
 
             ConfigFileLocation = args.GetParamValueAsString(PARAMETERCONFIG);
+            // Convert the relative paths to absulute path
+            ConfigFileLocation = Path.GetFullPath(ConfigFileLocation);
 
             if (!File.Exists(ConfigFileLocation))
             {
                 throw new Exception($"Configuration file is not specified from {ConfigFileLocation}");
             }
-
-            // Convert the relative paths to absulute path
-            ConfigFileLocation = Path.GetFullPath(ConfigFileLocation);
 
             IConfigurationRoot configuration;
             try
@@ -163,6 +171,24 @@ namespace Framework.Utilities.PocoGenerator
 
                 InputOutputFiles.Add(item);
             }
+
+            section = configuration.GetSection(SECTIONIGNOREDTABLES);
+            foreach (var child in section.GetChildren())
+            {
+                if (child == null || child.Value == null)
+                    continue;
+
+                IgnoredTableNames.Add(child.Value.Trim().ToUpper());
+            }
+
+            section = configuration.GetSection(SECTIONINBUILTSCHEMA);
+            foreach (var child in section.GetChildren())
+            {
+                if (child == null || child.Value == null)
+                    continue;
+
+                InbuiltSchema.Add(child.Value.Trim().ToUpper());
+            }
         }
 
         public DbConnection GetConnection()
@@ -173,22 +199,19 @@ namespace Framework.Utilities.PocoGenerator
             }
 
             var dbType = DbType.Trim().ToLower();
-            DbConnection dbConnection = null;
 
             switch (dbType)
             {
                 case MSSQLDBTYPE:
                     {
-                        dbConnection = new SqlConnection(ConnectionString);
+                        return new SqlConnection(ConnectionString);
                     }
 
-                    break;
                 case MYSQLDBTYPE:
                     {
-                        dbConnection = new MySqlConnection(ConnectionString);
+                        return new MySqlConnection(ConnectionString);
                     }
 
-                    break;
                 case SQLITE3DBTYPE:
                     {
                         throw new NotImplementedException();
@@ -197,8 +220,6 @@ namespace Framework.Utilities.PocoGenerator
                 default:
                     throw new Exception($"DbType {DbType} is not valid.");
             }
-
-            return dbConnection;
         }
 
         private string SubstituteVariables(string str)

@@ -7,14 +7,13 @@ For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 using System;
 using System.Linq;
 using System.Reflection;
-using FluentMigrator;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using Framework.Data.DbAccess;
-using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Logging;
 using Framework.Infrastructure.Models.Config;
+#pragma warning disable CS0612 // Type or member is obsolete
 
 namespace Framework.Data.Migrations
 {
@@ -24,7 +23,7 @@ namespace Framework.Data.Migrations
         private readonly IDBInfo dbInfo;
         private readonly DbConnectionInfo dbSettings;
 
-        protected DBMigration(IBaseConfiguration config , ILog log, IDBInfo dbInfo)
+        protected DBMigration(ILog log, IDBInfo dbInfo)
         {
             this.log = log;
             this.dbInfo = dbInfo;
@@ -36,10 +35,16 @@ namespace Framework.Data.Migrations
             var announcer = new TextWriterAnnouncer(x => System.Diagnostics.Debug.WriteLine(x));
             var assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
 
+            if (assembly == null)
+            {
+                log.Error($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                throw new Exception($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+            }
+
             var migrationContext = new RunnerContext(announcer)
             {
                 Namespace = dbSettings.MigrationNamespace,
-                Profile = dbSettings.MigrationProfile
+                Profile = dbSettings.MigrationProfile == "" ? null : dbSettings.MigrationProfile,
             };
 
             var options = new MigrationOptions { PreviewOnly = false, Timeout = 60 };
@@ -62,6 +67,12 @@ namespace Framework.Data.Migrations
             var announcer = new TextWriterAnnouncer(s => log.Info(s));
             var assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
 
+            if (assembly == null)
+            {
+                log.Error($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                throw new Exception($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+            }
+
             var migrationContext = new RunnerContext(announcer)
             {
                 Profile = dbSettings.MigrationProfile,
@@ -81,6 +92,9 @@ namespace Framework.Data.Migrations
 
         private Assembly GetMigrationAssembly(string migrationNamespace)
         {
+            //var alist = from a in AppDomain.CurrentDomain.GetAssemblies() select a.Location;
+            //log.Info($"assembly list = {alist.Count()}");
+
             var qry = from a in AppDomain.CurrentDomain.GetAssemblies()
                       from t in a.GetTypes()
                       where t.Namespace != null && t.Namespace.ToLower().Equals(migrationNamespace.ToLower().Trim())
@@ -89,3 +103,4 @@ namespace Framework.Data.Migrations
         }
     }
 }
+#pragma warning restore CS0612 // Type or member is obsolete

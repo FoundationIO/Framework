@@ -6,6 +6,7 @@ For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Framework.Infrastructure.Exceptions;
 
 namespace Framework.Infrastructure.Models.Result
@@ -21,65 +22,115 @@ namespace Framework.Infrastructure.Models.Result
         public ReturnModel(Exception ex)
         {
             IsSuccess = false;
-            ErrorHolder = new Error(ex);
+            ErrorHolder = new ReturnError(ex);
         }
 
-        public ReturnModel(string errorMsg, Exception ex = null)
+        public ReturnModel(ReturnError error)
         {
             IsSuccess = false;
-            ErrorHolder = new Error(errorMsg, ex);
+            ErrorHolder = error;
         }
 
-        public ReturnModel(string errorMsg, List<ErrorItem> errorList)
+        public ReturnModel(string errorMsg, Exception ex = null, string internalErrorMsg = null)
         {
             IsSuccess = false;
-            ErrorHolder = new Error(errorMsg, errorList);
+            ErrorHolder = new ReturnError(errorMsg, ex , internalErrorMsg);
+        }
+
+        public ReturnModel(string errorMsg, List<ReturnErrorItem> errorList, string internalErrorMsg = null)
+        {
+            IsSuccess = false;
+            ErrorHolder = new ReturnError(errorMsg, errorList, internalErrorMsg);
         }
 
         public T Model { get; set; }
 
         public bool IsSuccess { get; set; }
 
-        public Error ErrorHolder { get; set; }
+        public string SuccessMessage { get; set; }
 
+        public ReturnError ErrorHolder { get; set; }
+
+        [JsonIgnore]
         public int ActiveTab { get; set; }
 
+        [JsonIgnore]
         public int HttpCode { get; set; }
 
-        public static ReturnModel<T> Success(T obj)
+        public static ReturnModel<TReturn> SimpleResult<TReturn>(TReturn result, string errorMsg, string internalErrorMsg = null, int httpCode = 200)
+            where TReturn : class
         {
-            return new ReturnModel<T>(obj) { IsSuccess = true };
+            if (result == null)
+            {
+                return ReturnModel<TReturn>.Error(errorMsg, internalErrorMsg, httpCode);
+            }
+            else
+            {
+                return ReturnModel<TReturn>.Success(result);
+            }
         }
 
-        public static ReturnModel<T> Error(Exception ex)
+        public static ReturnModel<bool> SimpleResult(bool result, string errorMsg, string internalErrorMsg = null, int httpCode = 200)
         {
-            return new ReturnModel<T>(ex) { IsSuccess = false };
+            if (!result)
+            {
+                return ReturnModel<bool>.Error(errorMsg, internalErrorMsg , httpCode);
+            }
+            else
+            {
+                return ReturnModel<bool>.Success(true);
+            }
         }
 
-        public static ReturnModel<T> Error(string errorMsg, Exception ex = null)
+        public static ReturnModel<T> Success(T obj, int httpCode = 200)
         {
-            return new ReturnModel<T>(errorMsg, ex) { IsSuccess = false };
+            return new ReturnModel<T>(obj) { IsSuccess = true , HttpCode = httpCode };
         }
 
-        public static ReturnModel<T> Error(string errorMsg, List<ErrorItem> errorList)
+        public static ReturnModel<T> Error(ReturnError error, int httpCode = 200)
         {
-            return new ReturnModel<T>(errorMsg, errorList) { IsSuccess = false };
+            return new ReturnModel<T>("") { IsSuccess = false, HttpCode = httpCode , ErrorHolder = error };
         }
 
-        public static ReturnModel<T> Error(string errorMsg, List<string> errorMsgList)
+        public static ReturnModel<T> Error(Exception ex, string internalErrorMsg = null, int httpCode = 200)
         {
-            var errorList = new List<ErrorItem>();
+            return new ReturnModel<T>(null, ex, internalErrorMsg) { IsSuccess = false, HttpCode = httpCode };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, Exception ex, string internalErroMsg = null, int httpCode = 200)
+        {
+            return new ReturnModel<T>(errorMsg, ex, internalErroMsg) { IsSuccess = false , HttpCode = httpCode };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, string internalErrorMsg = null, int httpCode = 200)
+        {
+            return new ReturnModel<T>(errorMsg, (Exception)null, internalErrorMsg) { IsSuccess = false, HttpCode = httpCode };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, List<ReturnErrorItem> errorList, string internalErrorMsg = null, int httpCode = 200)
+        {
+            return new ReturnModel<T>(errorMsg, errorList, internalErrorMsg) { IsSuccess = false, HttpCode = httpCode };
+        }
+
+        public static ReturnModel<T> Error(string errorMsg, List<string> errorMsgList, string internalErrorMsg = null, int httpCode = 200)
+        {
+            var errorList = new List<ReturnErrorItem>();
             foreach (var msg in errorMsgList)
             {
-                errorList.Add(new ErrorItem() { Value = msg });
+                errorList.Add(new ReturnErrorItem() { Value = msg });
             }
 
-            return new ReturnModel<T>(errorMsg, errorList) { IsSuccess = false };
+            return new ReturnModel<T>(errorMsg, errorList, internalErrorMsg) { IsSuccess = false, HttpCode = httpCode };
         }
 
-        public static ReturnModel<T> Error(List<string> errorMsgList)
+        public static ReturnModel<T> Error(List<string> errorMsgList, int httpCode = 200)
         {
-            return Error("", errorMsgList);
+            return Error("", errorMsgList,"", httpCode);
+        }
+
+        public static ReturnModel<T> Error(List<ReturnErrorItem> errorList, int httpCode = 200)
+        {
+            return Error("", errorList, "", httpCode);
         }
     }
 }

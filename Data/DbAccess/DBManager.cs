@@ -11,13 +11,15 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Constants;
+using Framework.Infrastructure.Interfaces.DbAccess;
 using Framework.Infrastructure.Logging;
 using Framework.Infrastructure.Models.Config;
+using Framework.Infrastructure.Models.Result;
 using LinqToDB;
 using LinqToDB.Data;
-using LinqToDB.DataProvider;
 
 namespace Framework.Data.DbAccess
 {
@@ -39,6 +41,7 @@ namespace Framework.Data.DbAccess
             ConnectionString = dbInfo.GetConnectionString();
             EnsureOpenConnection();
             ToggleLogging();
+            log.Debug($"Creating Instance of {this.GetType()} with HashCode - {this.GetHashCode()}");
         }
 
         public string ConnectionString { get; set; }
@@ -56,6 +59,24 @@ namespace Framework.Data.DbAccess
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public ITable<T> GetTable<T>(Expression<Func<T, bool>> predicate = null)
+            where T : class
+        {
+            if (predicate == null)
+                return Connection.GetTable<T>();
+            else
+                return Connection.GetTable<T>().Where(predicate) as ITable<T>;
+        }
+
+        public IQueryable<T> GetTableAsQueryable<T>(Expression<Func<T, bool>> predicate = null)
+            where T : class
+        {
+            if (predicate != null)
+                return GetTable<T>().AsQueryable().Where(predicate);
+            else
+                return GetTable<T>().AsQueryable();
         }
 
         public int BeginTransaction(DBTransactionIsolationLevel dBTransactionIsolationLevel)
@@ -121,6 +142,30 @@ namespace Framework.Data.DbAccess
             }
         }
 
+        public object InsertWithAudit<T>(T obj, string createdBy)
+            where T : class
+        {
+            if (obj is IAuditableModel)
+            {
+                var aModel = obj as IAuditableModel;
+                aModel.CreatedBy = createdBy;
+                aModel.CreatedDate = DateTime.UtcNow;
+                aModel.ModifiedBy = createdBy;
+                aModel.ModifiedDate = aModel.CreatedDate;
+            }
+
+            return this.Connection.InsertWithIdentity<T>(obj);
+        }
+
+        public void InsertWithAudit<T>(IEnumerable<T> objs, string createdBy)
+            where T : class
+        {
+            foreach (var obj in objs)
+            {
+                InsertWithAudit(obj, createdBy);
+            }
+        }
+
         public void Update<T>(T obj)
             where T : class
         {
@@ -133,6 +178,28 @@ namespace Framework.Data.DbAccess
             foreach (var obj in objs)
             {
                 Update(obj);
+            }
+        }
+
+        public void UpdateWithAudit<T>(T obj, string modifiedBy)
+            where T : class
+        {
+            if (obj is IAuditableModel)
+            {
+                var aModel = obj as IAuditableModel;
+                aModel.ModifiedDate = aModel.CreatedDate;
+                aModel.ModifiedBy = modifiedBy;
+            }
+
+            Connection.Update<T>(obj);
+        }
+
+        public void UpdateWithAudit<T>(IEnumerable<T> objs, string modifiedBy)
+            where T : class
+        {
+            foreach (var obj in objs)
+            {
+                UpdateWithAudit(obj, modifiedBy);
             }
         }
 
@@ -157,13 +224,26 @@ namespace Framework.Data.DbAccess
         public List<T> Select<T>(Expression<Func<T, bool>> predicate)
             where T : class
         {
-            return GetTable<T>().Where(predicate).ToList();
+            var sql = GetTable<T>().Where(predicate);
+            return sql.ToList();
         }
 
         public List<T> SelectAll<T>()
             where T : class
         {
             return GetTable<T>().ToList<T>();
+        }
+
+        public bool Exists<T>()
+            where T : class
+        {
+            return GetTable<T>().Any();
+        }
+
+        public bool Exists<T>(Expression<Func<T, bool>> predicate)
+            where T : class
+        {
+            return GetTable<T>().Any(predicate);
         }
 
         public long Count<T>(Expression<Func<T, bool>> predicate)
@@ -178,7 +258,7 @@ namespace Framework.Data.DbAccess
             return GetTable<T>().Count<T>();
         }
 
-        public List<T> SelectByPage<T>(int pageNumber, int pageSize, out long totalItems, Expression<Func<T, bool>> predicate = null)
+        public DbReturnListModel<T> SelectByPageWithTotalRows<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
             where T : class
         {
             if (pageSize == 0)
@@ -187,18 +267,18 @@ namespace Framework.Data.DbAccess
                 pageNumber = 1;
 
             var querable = GetTable<T>().Skip(pageSize * (pageNumber - 1)).Take(pageSize);
-
+            long totalItems;
             if (predicate != null)
             {
                 querable = querable.Where(predicate);
-                totalItems = GetTable<T>().Count(predicate);
+                totalItems = GetTable<T>().LongCount(predicate);
             }
             else
             {
-                totalItems = GetTable<T>().Count();
+                totalItems = GetTable<T>().LongCount();
             }
 
-            return querable.ToList();
+            return new DbReturnListModel<T>(querable.ToList(),totalItems);
         }
 
         public List<T> SelectByPage<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
@@ -229,10 +309,230 @@ namespace Framework.Data.DbAccess
             }
         }
 
-        public ITable<T> GetTable<T>()
+        //Async Methods
+        public async Task<int> BeginTransactionAsync(DBTransactionIsolationLevel dBTransactionIsolationLevel)
+        {
+            if (currentTransactionCount == 0)
+                commonTransaction = await Connection.BeginTransactionAsync((IsolationLevel)dBTransactionIsolationLevel);
+
+            currentTransactionCount++;
+            log.SqlBeginTransaction(currentTransactionCount, currentTransactionCount == 0);
+            return currentTransactionCount;
+        }
+
+        public async Task<int> RollbackTransactionAsync()
+        {
+            if (currentTransactionCount == 0)
+                throw new Exception("Begin Transaction should be called before Rollback Transaction.");
+
+            currentTransactionCount--;
+            log.SqlRollbackTransaction(currentTransactionCount, currentTransactionCount == 0);
+            if (currentTransactionCount == 0)
+            {
+                await commonTransaction.RollbackAsync();
+            }
+
+            return currentTransactionCount;
+        }
+
+        public async Task<int> CommitTransactionAsync()
+        {
+            if (currentTransactionCount == 0)
+                throw new Exception("Begin Transaction should be called before Commit Transaction.");
+
+            currentTransactionCount--;
+            log.SqlCommitTransaction(currentTransactionCount, currentTransactionCount == 0);
+            if (currentTransactionCount == 0)
+            {
+                await commonTransaction.CommitAsync();
+                commonTransaction.Dispose();
+                commonTransaction = null;
+            }
+
+            return currentTransactionCount;
+        }
+
+        public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> where)
             where T : class
         {
-            return Connection.GetTable<T>();
+            return await GetTable<T>().DeleteAsync(where);
+        }
+
+        public async Task<object> InsertAsync<T>(T obj)
+            where T : class
+        {
+            return await this.Connection.InsertWithIdentityAsync<T>(obj);
+        }
+
+        public async Task InsertAsync<T>(IEnumerable<T> objs)
+            where T : class
+        {
+            foreach (var obj in objs)
+            {
+                await InsertAsync(obj);
+            }
+        }
+
+        public async Task<object> InsertWithAuditAsync<T>(T obj, string createdBy)
+            where T : class
+        {
+            if (obj is IAuditableModel)
+            {
+                var aModel = obj as IAuditableModel;
+                aModel.CreatedBy = createdBy;
+                aModel.CreatedDate = DateTime.UtcNow;
+                aModel.ModifiedBy = createdBy;
+                aModel.ModifiedDate = aModel.CreatedDate;
+            }
+
+            return await this.Connection.InsertWithIdentityAsync<T>(obj);
+        }
+
+        public async Task InsertWithAuditAsync<T>(IEnumerable<T> objs, string createdBy)
+            where T : class
+        {
+            foreach (var obj in objs)
+            {
+                await InsertWithAuditAsync(obj, createdBy);
+            }
+        }
+
+        public async Task UpdateAsync<T>(T obj)
+            where T : class
+        {
+            await Connection.UpdateAsync<T>(obj);
+        }
+
+        public async Task UpdateAsync<T>(IEnumerable<T> objs)
+            where T : class
+        {
+            foreach (var obj in objs)
+            {
+                await UpdateAsync(obj);
+            }
+        }
+
+        public async Task UpdateWithAuditAsync<T>(T obj, string modifiedBy)
+            where T : class
+        {
+            if (obj is IAuditableModel)
+            {
+                var aModel = obj as IAuditableModel;
+                aModel.ModifiedDate = aModel.CreatedDate;
+                aModel.ModifiedBy = modifiedBy;
+            }
+
+            await Connection.UpdateAsync<T>(obj);
+        }
+
+        public async Task UpdateWithAuditAsync<T>(IEnumerable<T> objs, string modifiedBy)
+            where T : class
+        {
+            foreach (var obj in objs)
+            {
+                await UpdateWithAuditAsync(obj, modifiedBy);
+            }
+        }
+
+        public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate)
+            where T : class
+        {
+            return await GetTable<T>().FirstAsync(predicate);
+        }
+
+        public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate)
+            where T : class
+        {
+            return await GetTable<T>().FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<List<T>> SelectAsync<T>(Expression<Func<T, bool>> predicate)
+            where T : class
+        {
+            var sql = GetTable<T>().Where(predicate);
+            return await sql.ToListAsync();
+        }
+
+        public async Task<List<T>> SelectAllAsync<T>()
+            where T : class
+        {
+            return await GetTable<T>().ToListAsync<T>();
+        }
+
+        public async Task<bool> ExistsAsync<T>()
+            where T : class
+        {
+            return await GetTable<T>().AnyAsync();
+        }
+
+        public async Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate)
+            where T : class
+        {
+            return await GetTable<T>().AnyAsync(predicate);
+        }
+
+        public async Task<long> CountAsync<T>(Expression<Func<T, bool>> predicate)
+            where T : class
+        {
+            return await GetTable<T>().LongCountAsync(predicate);
+        }
+
+        public async Task<long> CountAsync<T>()
+            where T : class
+        {
+            return await GetTable<T>().LongCountAsync<T>();
+        }
+
+        public async Task<DbReturnListModel<T>> SelectByPageWithTotalRowsAsync<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
+            where T : class
+        {
+            if (pageSize == 0)
+                pageSize = 100;
+            if (pageNumber <= 0)
+                pageNumber = 1;
+
+            var querable = GetTable<T>().Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+
+            long totalItems;
+            if (predicate != null)
+            {
+                querable = querable.Where(predicate);
+                totalItems = await GetTable<T>().CountAsync(predicate);
+            }
+            else
+            {
+                totalItems = await GetTable<T>().CountAsync();
+            }
+
+            return new DbReturnListModel<T>(await querable.ToListAsync(), totalItems);
+        }
+
+        public async Task<List<T>> SelectByPageAsync<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
+            where T : class
+        {
+            if (pageSize == 0)
+                pageSize = 100;
+
+            if (pageNumber <= 0)
+                pageNumber = 1;
+
+            var querable = GetTable<T>().Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+
+            if (predicate != null)
+            {
+                querable = querable.Where(predicate);
+            }
+
+            return await querable.ToListAsync();
+        }
+
+        public async Task InsertAllAsync<T>(List<T> list)
+            where T : class
+        {
+            foreach (var item in list)
+            {
+                await InsertAsync(item);
+            }
         }
 
         // Protected implementation of Dispose pattern.
@@ -241,8 +541,16 @@ namespace Framework.Data.DbAccess
             if (disposed)
                 return;
 
+            log.Debug($"Destroying Instance of {this.GetType()} with HashCode - {this.GetHashCode()}");
+
             if (disposing)
             {
+                if (commonTransaction != null)
+                {
+                    commonTransaction.Dispose();
+                    commonTransaction = null;
+                }
+
                 if ((connection != null) && (connection.Connection?.State == ConnectionState.Open))
                     connection.Close();
 
@@ -263,7 +571,7 @@ namespace Framework.Data.DbAccess
                 DataConnection.TurnTraceSwitchOn(System.Diagnostics.TraceLevel.Verbose);
                 DataConnection.OnTrace = info =>
                 {
-                    if (info.TraceInfoStep == TraceInfoStep.BeforeExecute)
+                    if (info.TraceInfoStep != TraceInfoStep.AfterExecute)
                         return;
 
                     var profiledDbCommand = info.Command;

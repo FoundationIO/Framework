@@ -8,7 +8,7 @@ using System;
 
 namespace Framework.Infrastructure.Models.Search
 {
-    public class BaseSearchCriteria
+    public class BaseSearchCriteria : IBaseSearchCriteria
     {
         public BaseSearchCriteria()
         {
@@ -31,30 +31,9 @@ namespace Framework.Infrastructure.Models.Search
 
         public int CurrentRows { get; set; }
 
-        public DateTime? FromDate { get; set; }
-
-        public DateTime? ToDate { get; set; }
-
         public long TotalRowCount { get; set; }
 
         public int NumericPageCount { get; set; }
-
-        public void FixDefaultValues()
-        {
-            if ((this.ToDate == null) && (this.FromDate == null))
-            {
-                this.FromDate = DateTime.Today.AddDays(-7);
-                this.ToDate = DateTime.Today;
-            }
-            else if ((this.ToDate == null) && (this.FromDate != null))
-            {
-                this.ToDate = DateTime.Today;
-            }
-            else if ((this.ToDate != null) && (this.FromDate == null))
-            {
-                this.FromDate = this.ToDate.Value.AddDays(-7);
-            }
-        }
 
         public int CurrentPageStartRow()
         {
@@ -99,7 +78,7 @@ namespace Framework.Infrastructure.Models.Search
                 return 0;
             }
 
-            Page = Page - 1;
+            Page -= 1;
             return PageSize * Page;
         }
 

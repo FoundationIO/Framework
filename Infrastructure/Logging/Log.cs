@@ -10,6 +10,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Constants;
+using Framework.Infrastructure.Exceptions;
 using Framework.Infrastructure.Models.Config;
 using Framework.Infrastructure.Utils;
 using NLog.Config;
@@ -21,7 +22,7 @@ namespace Framework.Infrastructure.Logging
     {
         private const string AppLoggerName = "AppLog";
         private const string PerfLoggerName = "PerfLog";
-        private const string AppFileLayout = "${longdate}\t${event-context:item=severity}\t${processid}\t${threadid}\t${event-context:item=current-function}\t${event-context:item=current-source-file-name}\t${event-context:item=current-source-line-number}\t${event-context:item=elapsed-time}\t${event-context:item=result}\t${message}";
+        private const string AppFileLayout = "${longdate}\t${activityid}\t${event-context:item=severity}\t${processid}\t${threadid}\t${event-context:item=current-function}\t${event-context:item=current-source-file-name}\t${event-context:item=current-source-line-number}\t${event-context:item=elapsed-time}\t${event-context:item=result}\t${message}";
         private const string PerfConsoleLayout = "${time} ${event-context:item=app-module} ${event-context:item=app-function} ";
         private const string PerfFileLayout = "${longdate}\t${event-context:item=app-function}\t${event-context:item=start-time\t${event-context:item=end-time\t${event-context:item=elapsed-time\t${event-context:item=parameters\t${event-context:item=status";
         private const string AppConsoleLayout = "${time} [${event-context:item=severity}] ${message}";
@@ -132,6 +133,14 @@ namespace Framework.Infrastructure.Logging
             }
         }
 
+        public void Trace(ReturnError ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        {
+            if (logConfig.LogTrace)
+            {
+                this.LogEvent(Strings.Log.Trace, NLog.LogLevel.Trace, $"{str} " + (ex != null ? $"Exception - {ex.AllErrorAsString()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
+        }
+
         public void Debug(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogDebug)
@@ -145,6 +154,14 @@ namespace Framework.Infrastructure.Logging
             if (logConfig.LogDebug)
             {
                 this.LogEvent(Strings.Log.Debug, NLog.LogLevel.Debug, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
+        }
+
+        public void Debug(ReturnError ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        {
+            if (logConfig.LogDebug)
+            {
+                this.LogEvent(Strings.Log.Debug, NLog.LogLevel.Debug, $"{str} " + (ex != null ? $"Exception - {ex.AllErrorAsString()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
             }
         }
 
@@ -164,6 +181,14 @@ namespace Framework.Infrastructure.Logging
             }
         }
 
+        public void Info(ReturnError ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        {
+            if (logConfig.LogInfo)
+            {
+                this.LogEvent(Strings.Log.Info, NLog.LogLevel.Info, $"{str} " + (ex != null ? $"Exception - {ex.AllErrorAsString()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
+        }
+
         public void Warn(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogWarn)
@@ -177,6 +202,14 @@ namespace Framework.Infrastructure.Logging
             if (logConfig.LogWarn)
             {
                 this.LogEvent(Strings.Log.Warning, NLog.LogLevel.Warn, $"{str} " + (ex != null ? $"Exception - {ex.RecursivelyGetExceptionMessage()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
+        }
+
+        public void Warn(ReturnError ex, string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        {
+            if (logConfig.LogWarn)
+            {
+                this.LogEvent(Strings.Log.Warning, NLog.LogLevel.Warn, $"{str} " + (ex != null ? $"Exception - {ex.AllErrorAsString()}" : string.Empty), string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
             }
         }
 
@@ -204,6 +237,14 @@ namespace Framework.Infrastructure.Logging
             }
         }
 
+        public void Error(ReturnError ex, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        {
+            if (logConfig.LogError)
+            {
+                this.LogEvent(Strings.Log.Error, NLog.LogLevel.Error, $"Exception - {ex.AllErrorAsString()}", string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+            }
+        }
+
         public void Fatal(string str, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             this.LogEvent(Strings.Log.Fatal, NLog.LogLevel.Fatal, str, string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
@@ -217,6 +258,11 @@ namespace Framework.Infrastructure.Logging
         public void Fatal(Exception ex, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             this.LogEvent(Strings.Log.Fatal, NLog.LogLevel.Fatal, $"Exception - {ex.RecursivelyGetExceptionMessage()}", string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
+        }
+
+        public void Fatal(ReturnError ex, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        {
+            this.LogEvent(Strings.Log.Fatal, NLog.LogLevel.Fatal, $"Exception - {ex.AllErrorAsString()}", string.Empty, string.Empty, sourceLineNumber, memberName, sourceFilePath);
         }
 
         public void SqlBeginTransaction(int count, bool functionCalled, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
@@ -247,7 +293,7 @@ namespace Framework.Infrastructure.Logging
         {
             if (logConfig.LogSql)
             {
-                this.LogEvent(Strings.Log.Sql, NLog.LogLevel.Info, sqlStr, (ts.TotalMilliseconds / 1000).ToString(), sqlResult,  sourceLineNumber, memberName, sourceFilePath);
+                this.LogEvent(Strings.Log.Sql, NLog.LogLevel.Info, sqlStr, (ts.TotalMilliseconds / 1000).ToString(), sqlResult, sourceLineNumber, memberName, sourceFilePath);
             }
         }
 
@@ -267,7 +313,7 @@ namespace Framework.Infrastructure.Logging
             }
         }
 
-        public void Performance(string appModule, string appFunction, DateTime startTime, DateTime endTime, List<KeyValuePair<string,object>> parameters, int statusCode , string status, string additionalMsg, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
+        public void Performance(string appModule, string appFunction, DateTime startTime, DateTime endTime, List<KeyValuePair<string, object>> parameters, int statusCode, string status, string additionalMsg, [CallerLineNumber] int sourceLineNumber = 0, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "")
         {
             if (logConfig.LogPerformance)
             {

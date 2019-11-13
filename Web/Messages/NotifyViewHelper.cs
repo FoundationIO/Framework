@@ -18,29 +18,14 @@ namespace Framework.Web.Messages
             return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ErrorMsg));
         }
 
-        public static bool IsInfoMsgSet(this ViewContext helper)
-        {
-            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.InfoMsg));
-        }
-
-        public static bool IsWarningMsgSet(this ViewContext helper)
-        {
-            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.WarningMsg));
-        }
-
-        public static bool IsSuccessMsgSet(this ViewContext helper)
-        {
-            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.SuccessMsg));
-        }
-
-        public static bool IsShowCaptionSet(this ViewContext helper)
-        {
-            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ShowCaption));
-        }
-
         public static bool IsErrorMsgSet(this IHtmlHelper helper)
         {
             return helper.ViewContext.IsErrorMsgSet();
+        }
+
+        public static bool IsInfoMsgSet(this ViewContext helper)
+        {
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.InfoMsg));
         }
 
         public static bool IsInfoMsgSet(this IHtmlHelper helper)
@@ -48,14 +33,29 @@ namespace Framework.Web.Messages
             return helper.ViewContext.IsInfoMsgSet();
         }
 
+        public static bool IsWarningMsgSet(this ViewContext helper)
+        {
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.WarningMsg));
+        }
+
         public static bool IsWarningMsgSet(this IHtmlHelper helper)
         {
             return helper.ViewContext.IsWarningMsgSet();
         }
 
+        public static bool IsSuccessMsgSet(this ViewContext helper)
+        {
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.SuccessMsg));
+        }
+
         public static bool IsSuccessMsgSet(this IHtmlHelper helper)
         {
             return helper.ViewContext.IsSuccessMsgSet();
+        }
+
+        public static bool IsShowCaptionSet(this ViewContext helper)
+        {
+            return (helper.TempData != null) && helper.TempData.Keys.Any(item => item.Equals(NotifyMessageContants.ShowCaption));
         }
 
         public static bool IsShowCaptionSet(this IHtmlHelper helper)

@@ -7,7 +7,6 @@ For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Framework.Infrastructure.Utils
