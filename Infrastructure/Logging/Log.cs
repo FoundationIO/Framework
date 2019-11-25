@@ -23,9 +23,9 @@ namespace Framework.Infrastructure.Logging
         private const string AppLoggerName = "AppLog";
         private const string PerfLoggerName = "PerfLog";
         private const string AppFileLayout = "${longdate}\t${activityid}\t${event-context:item=severity}\t${processid}\t${threadid}\t${event-context:item=current-function}\t${event-context:item=current-source-file-name}\t${event-context:item=current-source-line-number}\t${event-context:item=elapsed-time}\t${event-context:item=result}\t${message}";
-        private const string PerfConsoleLayout = "${time} ${event-context:item=app-module} ${event-context:item=app-function} ";
+        private const string PerfConsoleLayout = "${time} ${threadid} ${event-context:item=app-module} ${event-context:item=app-function} ";
         private const string PerfFileLayout = "${longdate}\t${event-context:item=app-function}\t${event-context:item=start-time\t${event-context:item=end-time\t${event-context:item=elapsed-time\t${event-context:item=parameters\t${event-context:item=status";
-        private const string AppConsoleLayout = "${time} [${event-context:item=severity}] ${message}";
+        private const string AppConsoleLayout = "${time} ${threadid} [${event-context:item=severity}] ${message}";
 
         private readonly LogSettings logConfig;
         private readonly NLog.Logger logger = null;

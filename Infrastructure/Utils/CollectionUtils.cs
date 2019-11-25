@@ -11,7 +11,7 @@ namespace Framework.Infrastructure.Utils
 {
     public static class CollectionUtils
     {
-        public static bool IsNotNullAndEmpty<TSource>(this IEnumerable<TSource> source)
+        public static bool IsNotNullOrEmpty<TSource>(this IEnumerable<TSource> source)
         {
             if (!((source == null) || (!source.Any())))
                 return true;
@@ -20,7 +20,21 @@ namespace Framework.Infrastructure.Utils
 
         public static bool IsNullOrEmpty<TSource>(this IEnumerable<TSource> source)
         {
-            return !IsNotNullAndEmpty(source);
+            return !IsNotNullOrEmpty(source);
+        }
+
+        public static bool IsAllTrue(this IEnumerable<bool> source)
+        {
+            if (source == null || !source.Any())
+                return false;
+
+            foreach (var item in source)
+            {
+                if (!item)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

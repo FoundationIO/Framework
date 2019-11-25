@@ -20,10 +20,15 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="AsyncFixer" Version="1.1.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FluentMigrator.Runner" Version="3.2.1" />
-    <PackageReference Include="linq2db" Version="2.9.2" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.0.0" />
+    <PackageReference Include="linq2db" Version="2.9.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.0.1" />
     <PackageReference Include="SecurityCodeScan" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

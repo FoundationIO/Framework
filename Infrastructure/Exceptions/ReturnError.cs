@@ -29,15 +29,19 @@ namespace Framework.Infrastructure.Exceptions
             FriendlyMessage = friendlyMessage;
             InternalErrorMessage = internalErrorMessage ?? friendlyMessage;
             ErrorItemList = errorItemList;
-            Exception = new ReturnException(ex);
+            if (ex != null)
+                Exception = new ReturnException(ex);
         }
 
         public ReturnError(Exception ex)
         {
-            FriendlyMessage = ex.Message;
-            InternalErrorMessage = ex.Message;
-            ErrorItemList = null;
-            Exception = new ReturnException(ex);
+            if (ex != null)
+            {
+                FriendlyMessage = ex.Message;
+                InternalErrorMessage = ex.Message;
+                ErrorItemList = null;
+                Exception = new ReturnException(ex);
+            }
         }
 
         public ReturnError(string friendlyMessage, Exception ex, string internalMessage = null)
@@ -45,7 +49,8 @@ namespace Framework.Infrastructure.Exceptions
             FriendlyMessage = friendlyMessage;
             InternalErrorMessage = internalMessage ?? friendlyMessage;
             ErrorItemList = null;
-            Exception = new ReturnException(ex);
+            if (ex != null)
+                Exception = new ReturnException(ex);
         }
 
         public string FriendlyMessage { get; set; }

@@ -27,17 +27,11 @@ namespace Framework.Infrastructure.Utils
             }
         }
 
-        public static bool VerifyMd5Hash(string input, string hash)
+        public static bool VerifyHA256Hash(string input, string hash)
         {
             string hashOfInput = GetSHA256Hash(input);
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
             return comparer.Compare(hashOfInput, hash) == 0;
         }
-
-        //public static string GeneratePublicAndPrivateKey()
-        //{
-        //    RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-        //    RSAParameters rsaKeyInfo = rsa.ExportParameters(false);
-        //}
     }
 }

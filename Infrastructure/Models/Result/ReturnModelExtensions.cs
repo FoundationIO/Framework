@@ -13,162 +13,200 @@ namespace Framework.Infrastructure.Models.Result
 {
     public static class ReturnModelExtensions
     {
-        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, Exception ex = null)
+        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, int httpCode)
         {
             log.Error(errorMsg);
-            return new ReturnModel<T>(errorMsg, ex);
+            return ReturnModel<T>.Error(errorMsg, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, List<ReturnErrorItem> errorList)
+        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, Exception ex = null, int httpCode = 200)
+        {
+            log.Error(ex, errorMsg);
+            return ReturnModel<T>.Error(errorMsg, ex,httpCode: httpCode);
+        }
+
+        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             log.Error(errorMsg);
-            return new ReturnModel<T>(errorMsg, errorList);
+            return ReturnModel<T>.Error(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, string logMsg, Exception ex = null)
+        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, string logMsg, Exception ex = null, int httpCode = 200)
         {
             log.Error(logMsg);
-            return new ReturnModel<T>(errorMsg, ex);
+            return ReturnModel<T>.Error(errorMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, ReturnError returnError)
+        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, ReturnError returnError, int httpCode = 200)
         {
             log.Error(returnError);
-            return new ReturnModel<T>(returnError);
+            return ReturnModel<T>.Error(returnError, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList)
+        public static ReturnModel<T> ErrorAndSendReturnModel<T>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             log.Error(errorMsg + logMsg);
-            return new ReturnModel<T>(errorMsg, errorList);
+            return ReturnModel<T>.Error(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, Exception ex = null)
+        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, int httpCode)
         {
             log.Warn(warnMsg);
-            return new ReturnModel<T>(warnMsg, ex);
+            return new ReturnModel<T>(warnMsg, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, List<ReturnErrorItem> errorList)
+        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, Exception ex = null, int httpCode = 200)
         {
             log.Warn(warnMsg);
-            return new ReturnModel<T>(warnMsg, errorList);
+            return new ReturnModel<T>(warnMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, string logMsg, Exception ex = null)
+        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
+        {
+            log.Warn(warnMsg);
+            return new ReturnModel<T>(warnMsg, errorList, httpCode: httpCode);
+        }
+
+        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, string logMsg, Exception ex = null, int httpCode = 200)
         {
             log.Warn(logMsg);
-            return new ReturnModel<T>(warnMsg, ex);
+            return new ReturnModel<T>(warnMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, string logMsg, List<ReturnErrorItem> errorList)
+        public static ReturnModel<T> WarnAndSendReturnModel<T>(this ILog log, string warnMsg, string logMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             log.Warn(logMsg);
-            return new ReturnModel<T>(warnMsg, errorList);
+            return new ReturnModel<T>(warnMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, Exception ex = null)
+        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, int httpCode)
         {
             log.Error(errorMsg);
-            return new ReturnListModel<T>(errorMsg, ex);
+            return ReturnListModel<T>.Error(errorMsg, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, Exception ex = null, int httpCode = 200)
+        {
+            log.Error(ex,errorMsg);
+            return ReturnListModel<T>.Error(errorMsg, ex, httpCode: httpCode);
+        }
+
+        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             log.Error(errorMsg);
-            return new ReturnListModel<T>(errorMsg, errorList);
+            return ReturnListModel<T>.Error(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, Exception ex = null)
+        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, Exception ex = null, int httpCode = 200)
         {
             log.Error(logMsg);
-            return new ReturnListModel<T>(errorMsg, ex);
+            return ReturnListModel<T>.Error(errorMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListModel<T> ErrorAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             log.Error(logMsg);
-            return new ReturnListModel<T>(errorMsg, errorList);
+            return ReturnListModel<T>.Error(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string warnMsg, Exception ex = null)
+        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string warnMsg, int httpCode)
         {
             log.Warn(warnMsg);
-            return new ReturnListModel<T>(warnMsg, ex);
+            return new ReturnListModel<T>(warnMsg, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string warnMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string warnMsg, Exception ex = null, int httpCode = 200)
         {
             log.Warn(warnMsg);
-            return new ReturnListModel<T>(warnMsg, errorList);
+            return new ReturnListModel<T>(warnMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, Exception ex = null)
+        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string warnMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
+        {
+            log.Warn(warnMsg);
+            return new ReturnListModel<T>(warnMsg, errorList, httpCode: httpCode);
+        }
+
+        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, Exception ex = null, int httpCode = 200)
         {
             log.Warn(logMsg);
-            return new ReturnListModel<T>(errorMsg, ex);
+            return new ReturnListModel<T>(errorMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListModel<T> WarnAndSendReturnListModel<T>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             log.Warn(logMsg);
-            return new ReturnListModel<T>(errorMsg, errorList);
+            return new ReturnListModel<T>(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, Exception ex = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, int httpCode)
             where TSearch : class
         {
             log.Error(errorMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(errorMsg, ex);
+            return ReturnListWithSearchModel<TModel, TSearch>.Error(errorMsg, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, Exception ex = null, int httpCode = 200)
+            where TSearch : class
+        {
+            log.Error(ex, errorMsg);
+            return ReturnListWithSearchModel<TModel, TSearch>.Error(errorMsg, ex, httpCode: httpCode);
+        }
+
+        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
             where TSearch : class
         {
             log.Error(errorMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(errorMsg, errorList);
+            return ReturnListWithSearchModel<TModel, TSearch>.Error(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, string logMsg, Exception ex = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, string logMsg, Exception ex = null, int httpCode = 200)
             where TSearch : class
         {
             log.Error(logMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(errorMsg, ex);
+            return ReturnListWithSearchModel<TModel, TSearch>.Error(errorMsg, ex, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListWithSearchModel<TModel, TSearch> ErrorAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string errorMsg, string logMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
             where TSearch : class
         {
             log.Error(logMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(errorMsg, errorList);
+            return ReturnListWithSearchModel<TModel, TSearch>.Error(errorMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, Exception ex = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, int httpCode)
             where TSearch : class
         {
             log.Warn(warnMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, ex);
+            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, List<ReturnErrorItem> errorList)
+        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, Exception ex = null, int httpCode = 200)
+            where TSearch : class
+        {
+            log.Warn(ex,warnMsg);
+            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, ex, httpCode: httpCode);
+        }
+
+        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
             where TSearch : class
         {
             log.Warn(warnMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, errorList);
+            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, errorList, httpCode: httpCode);
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, string logMsg, Exception ex = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, string logMsg, Exception ex = null, int httpCode = 200)
+            where TSearch : class
+        {
+            log.Warn(ex,logMsg);
+            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, ex, httpCode: httpCode);
+        }
+
+        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, string logMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
             where TSearch : class
         {
             log.Warn(logMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, ex);
-        }
-
-        public static ReturnListWithSearchModel<TModel, TSearch> WarnAndSendReturnListWithSearchModel<TModel, TSearch>(this ILog log, string warnMsg, string logMsg, List<ReturnErrorItem> errorList)
-            where TSearch : class
-        {
-            log.Warn(logMsg);
-            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, errorList);
+            return new ReturnListWithSearchModel<TModel, TSearch>(warnMsg, errorList, httpCode: httpCode);
         }
     }
 }

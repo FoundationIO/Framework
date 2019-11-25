@@ -88,6 +88,7 @@
   <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
     <Rule Id="S1066" Action="None" />
     <Rule Id="S112" Action="None" />
+    <Rule Id="S1135" Action="None" />
     <Rule Id="S4487" Action="Error" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">

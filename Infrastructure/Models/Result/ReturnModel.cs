@@ -13,33 +13,38 @@ namespace Framework.Infrastructure.Models.Result
 {
     public class ReturnModel<T> : IReturnModel
     {
-        public ReturnModel(T result)
+        public ReturnModel(T result, int httpCode = 200)
         {
             Model = result;
             IsSuccess = true;
+            HttpCode = httpCode;
         }
 
-        public ReturnModel(Exception ex)
+        public ReturnModel(Exception ex, int httpCode = 200)
         {
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = new ReturnError(ex);
         }
 
-        public ReturnModel(ReturnError error)
+        public ReturnModel(ReturnError error, int httpCode = 200)
         {
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = error;
         }
 
-        public ReturnModel(string errorMsg, Exception ex = null, string internalErrorMsg = null)
+        public ReturnModel(string errorMsg, Exception ex = null, string internalErrorMsg = null, int httpCode = 200)
         {
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = new ReturnError(errorMsg, ex , internalErrorMsg);
         }
 
-        public ReturnModel(string errorMsg, List<ReturnErrorItem> errorList, string internalErrorMsg = null)
+        public ReturnModel(string errorMsg, List<ReturnErrorItem> errorList, string internalErrorMsg = null, int httpCode = 200)
         {
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = new ReturnError(errorMsg, errorList, internalErrorMsg);
         }
 

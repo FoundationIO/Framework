@@ -16,11 +16,14 @@ namespace Framework.Infrastructure.Exceptions
 
         public ReturnException(Exception ex)
         {
-            StackTrace = ex.StackTrace;
-            Source = ex.Source;
-            Message = ex.Message;
-            if (ex.InnerException != null)
-                InnerException = new ReturnException(ex.InnerException);
+            if (ex != null)
+            {
+                StackTrace = ex.StackTrace;
+                Source = ex.Source;
+                Message = ex.Message;
+                if (ex.InnerException != null)
+                    InnerException = new ReturnException(ex.InnerException);
+            }
         }
 
         public string StackTrace { get; set; }

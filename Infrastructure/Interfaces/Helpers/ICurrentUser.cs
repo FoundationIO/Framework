@@ -9,5 +9,7 @@ namespace Framework.Infrastructure.Interfaces.Helpers
     public interface ICurrentUser
     {
         string GetCurrentUserName();
+
+        string GetCurrentUserAddress();
     }
 }

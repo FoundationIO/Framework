@@ -25,5 +25,10 @@ namespace Framework.Web.Helpers
         {
             return httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? $"App-{baseConfiguration.AppName}";
         }
+
+        public string GetCurrentUserAddress()
+        {
+            return httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+        }
     }
 }

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <AssemblyName>PocoGenerator</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>PocoGenerator</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+    <PropertyGroup>
+    <CodeAnalysisRuleSet>PocoGenerator.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+      
+  <ItemGroup>
+    <PackageReference Include="DatabaseSchemaReader" Version="2.7.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.15" />
+    <PackageReference Include="RazorLight" Version="2.0.0-alpha3" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.11.0.8083">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.110" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" />
+    
+  </ItemGroup>
+
+</Project>

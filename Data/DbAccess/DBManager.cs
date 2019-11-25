@@ -352,16 +352,16 @@ namespace Framework.Data.DbAccess
             return currentTransactionCount;
         }
 
-        public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> where)
+        public Task<int> DeleteAsync<T>(Expression<Func<T, bool>> where)
             where T : class
         {
-            return await GetTable<T>().DeleteAsync(where);
+            return GetTable<T>().DeleteAsync(where);
         }
 
-        public async Task<object> InsertAsync<T>(T obj)
+        public Task<object> InsertAsync<T>(T obj)
             where T : class
         {
-            return await this.Connection.InsertWithIdentityAsync<T>(obj);
+            return this.Connection.InsertWithIdentityAsync<T>(obj);
         }
 
         public async Task InsertAsync<T>(IEnumerable<T> objs)
@@ -373,7 +373,7 @@ namespace Framework.Data.DbAccess
             }
         }
 
-        public async Task<object> InsertWithAuditAsync<T>(T obj, string createdBy)
+        public Task<object> InsertWithAuditAsync<T>(T obj, string createdBy)
             where T : class
         {
             if (obj is IAuditableModel)
@@ -385,7 +385,7 @@ namespace Framework.Data.DbAccess
                 aModel.ModifiedDate = aModel.CreatedDate;
             }
 
-            return await this.Connection.InsertWithIdentityAsync<T>(obj);
+            return this.Connection.InsertWithIdentityAsync<T>(obj);
         }
 
         public async Task InsertWithAuditAsync<T>(IEnumerable<T> objs, string createdBy)
@@ -400,7 +400,7 @@ namespace Framework.Data.DbAccess
         public async Task UpdateAsync<T>(T obj)
             where T : class
         {
-            await Connection.UpdateAsync<T>(obj);
+            _ = await Connection.UpdateAsync<T>(obj);
         }
 
         public async Task UpdateAsync<T>(IEnumerable<T> objs)
@@ -422,7 +422,7 @@ namespace Framework.Data.DbAccess
                 aModel.ModifiedBy = modifiedBy;
             }
 
-            await Connection.UpdateAsync<T>(obj);
+            _ = await Connection.UpdateAsync<T>(obj);
         }
 
         public async Task UpdateWithAuditAsync<T>(IEnumerable<T> objs, string modifiedBy)
@@ -434,53 +434,53 @@ namespace Framework.Data.DbAccess
             }
         }
 
-        public async Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate)
+        public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate)
             where T : class
         {
-            return await GetTable<T>().FirstAsync(predicate);
+            return GetTable<T>().FirstAsync(predicate);
         }
 
-        public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate)
+        public Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate)
             where T : class
         {
-            return await GetTable<T>().FirstOrDefaultAsync(predicate);
+            return GetTable<T>().FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<List<T>> SelectAsync<T>(Expression<Func<T, bool>> predicate)
+        public Task<List<T>> SelectAsync<T>(Expression<Func<T, bool>> predicate)
             where T : class
         {
             var sql = GetTable<T>().Where(predicate);
-            return await sql.ToListAsync();
+            return sql.ToListAsync();
         }
 
-        public async Task<List<T>> SelectAllAsync<T>()
+        public Task<List<T>> SelectAllAsync<T>()
             where T : class
         {
-            return await GetTable<T>().ToListAsync<T>();
+            return GetTable<T>().ToListAsync<T>();
         }
 
-        public async Task<bool> ExistsAsync<T>()
+        public Task<bool> ExistsAsync<T>()
             where T : class
         {
-            return await GetTable<T>().AnyAsync();
+            return GetTable<T>().AnyAsync();
         }
 
-        public async Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate)
+        public Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate)
             where T : class
         {
-            return await GetTable<T>().AnyAsync(predicate);
+            return GetTable<T>().AnyAsync(predicate);
         }
 
-        public async Task<long> CountAsync<T>(Expression<Func<T, bool>> predicate)
+        public Task<long> CountAsync<T>(Expression<Func<T, bool>> predicate)
             where T : class
         {
-            return await GetTable<T>().LongCountAsync(predicate);
+            return GetTable<T>().LongCountAsync(predicate);
         }
 
-        public async Task<long> CountAsync<T>()
+        public Task<long> CountAsync<T>()
             where T : class
         {
-            return await GetTable<T>().LongCountAsync<T>();
+            return GetTable<T>().LongCountAsync<T>();
         }
 
         public async Task<DbReturnListModel<T>> SelectByPageWithTotalRowsAsync<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
@@ -507,7 +507,7 @@ namespace Framework.Data.DbAccess
             return new DbReturnListModel<T>(await querable.ToListAsync(), totalItems);
         }
 
-        public async Task<List<T>> SelectByPageAsync<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
+        public Task<List<T>> SelectByPageAsync<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
             where T : class
         {
             if (pageSize == 0)
@@ -523,7 +523,7 @@ namespace Framework.Data.DbAccess
                 querable = querable.Where(predicate);
             }
 
-            return await querable.ToListAsync();
+            return querable.ToListAsync();
         }
 
         public async Task InsertAllAsync<T>(List<T> list)
@@ -588,9 +588,9 @@ namespace Framework.Data.DbAccess
                     var parameterString = ptxt.ToString();
 
                     if (info.Exception == null)
-                        log.Sql((profiledDbCommand.CommandType == CommandType.StoredProcedure ? "SP - " : string.Empty) + profiledDbCommand.CommandText + (parameterString.Length > 0 ? ("//" + parameterString) : string.Empty), result, info.ExecutionTime ?? new TimeSpan(0));
+                        log.Sql((profiledDbCommand.CommandType == CommandType.StoredProcedure ? "SP - " : string.Empty) + profiledDbCommand.CommandText + (parameterString.Length > 0 ? ("--" + parameterString) : string.Empty) + " -- hashcode = " + this.GetHashCode(), result, info.ExecutionTime ?? new TimeSpan(0));
                     else
-                        log.SqlError(info.Exception, (profiledDbCommand.CommandType == CommandType.StoredProcedure ? "SP - " : string.Empty) + profiledDbCommand.CommandText + (parameterString.Length > 0 ? ("//" + parameterString) : string.Empty));
+                        log.SqlError(info.Exception, (profiledDbCommand.CommandType == CommandType.StoredProcedure ? "SP - " : string.Empty) + profiledDbCommand.CommandText + (parameterString.Length > 0 ? ("--" + parameterString) : string.Empty) + " -- hashcode = " + this.GetHashCode());
                 };
             }
             else

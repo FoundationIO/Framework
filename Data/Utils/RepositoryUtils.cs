@@ -46,7 +46,6 @@ namespace Framework.Data.Utils
 
         public static DbReturnListModel<T> ReturnListModelResult<T>(this IQueryable<T> sql, IBaseSearchCriteria baseSearchCriteria)
         {
-            baseSearchCriteria.SortBy
             return new DbReturnListModel<T>(sql.AsQueryable().ApplyPaging(baseSearchCriteria.Page, baseSearchCriteria.PageSize).ToList(), sql.AsQueryable().LongCount());
         }
 

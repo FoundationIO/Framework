@@ -14,65 +14,70 @@ namespace Framework.Infrastructure.Models.Result
     public class ReturnListWithSearchModel<TModel, TSearch> : IReturnModel
         where TSearch : class
     {
-        public ReturnListWithSearchModel(TSearch search, List<TModel> items, long totalItems)
+        public ReturnListWithSearchModel(TSearch search, List<TModel> items, long totalItems, int httpCode = 200)
         {
             Model = items;
             TotalRecords = totalItems;
             IsSuccess = true;
             Search = search;
+            HttpCode = httpCode;
         }
 
-        public ReturnListWithSearchModel(TSearch search, List<TModel> items)
+        public ReturnListWithSearchModel(TSearch search, List<TModel> items, int httpCode = 200)
         {
             Model = items;
             TotalRecords = items.Count;
             IsSuccess = true;
             Search = search;
+            HttpCode = httpCode;
         }
 
-        public ReturnListWithSearchModel(List<TModel> items, long totalItems)
-            : this(null, items, totalItems)
+        public ReturnListWithSearchModel(List<TModel> items, long totalItems, int httpCode = 200)
+            : this(null, items, totalItems, httpCode)
         {
         }
 
-        public ReturnListWithSearchModel(List<TModel> items)
-            : this(null, items)
+        public ReturnListWithSearchModel(List<TModel> items, int httpCode = 200)
+            : this(null, items, httpCode)
         {
         }
 
-        public ReturnListWithSearchModel(TSearch search, Exception ex)
+        public ReturnListWithSearchModel(TSearch search, Exception ex, int httpCode = 200)
         {
             Search = search;
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = new ReturnError(ex);
         }
 
-        public ReturnListWithSearchModel(TSearch search, string errorMsg, Exception ex = null)
+        public ReturnListWithSearchModel(TSearch search, string errorMsg, Exception ex = null, int httpCode = 200)
         {
             Search = search;
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = new ReturnError(errorMsg, ex);
         }
 
-        public ReturnListWithSearchModel(TSearch search, string errorMsg, List<ReturnErrorItem> errorList)
+        public ReturnListWithSearchModel(TSearch search, string errorMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
         {
             Search = search;
             IsSuccess = false;
+            HttpCode = httpCode;
             ErrorHolder = new ReturnError(errorMsg, errorList, errorMsg);
         }
 
-        public ReturnListWithSearchModel(Exception ex)
-            : this((TSearch)null, ex)
+        public ReturnListWithSearchModel(Exception ex, int httpCode = 200)
+            : this((TSearch)null, ex, httpCode)
         {
         }
 
-        public ReturnListWithSearchModel(string errorMsg, Exception ex = null)
-            : this(null, errorMsg, ex)
+        public ReturnListWithSearchModel(string errorMsg, Exception ex = null, int httpCode = 200)
+            : this(null, errorMsg, ex, httpCode)
         {
         }
 
-        public ReturnListWithSearchModel(string errorMsg, List<ReturnErrorItem> errorList)
-            : this(null, errorMsg, errorList)
+        public ReturnListWithSearchModel(string errorMsg, List<ReturnErrorItem> errorList, int httpCode = 200)
+            : this(null, errorMsg, errorList, httpCode)
         {
         }
 
@@ -94,24 +99,24 @@ namespace Framework.Infrastructure.Models.Result
         [JsonIgnore]
         public int HttpCode { get; set; }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> Success(TSearch search, List<TModel> objList, string sucessMessage = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> Success(TSearch search, List<TModel> objList, string sucessMessage = null, int httpCode = 200)
         {
-            return new ReturnListWithSearchModel<TModel, TSearch>(search, objList) { IsSuccess = true , SuccessMessage = sucessMessage };
+            return new ReturnListWithSearchModel<TModel, TSearch>(search, objList) { IsSuccess = true , SuccessMessage = sucessMessage, HttpCode = httpCode };
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> Success(TSearch search, List<TModel> objList, long totalItems, string sucessMessage = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> Success(TSearch search, List<TModel> objList, long totalItems, string sucessMessage = null, int httpCode = 200)
         {
-            return new ReturnListWithSearchModel<TModel, TSearch>(search, objList, totalItems) { IsSuccess = true, SuccessMessage = sucessMessage };
+            return new ReturnListWithSearchModel<TModel, TSearch>(search, objList, totalItems) { IsSuccess = true, SuccessMessage = sucessMessage, HttpCode = httpCode };
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> Success(List<TModel> objList, long totalItems, string sucessMessage = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> Success(List<TModel> objList, long totalItems, string sucessMessage = null, int httpCode = 200)
         {
-            return new ReturnListWithSearchModel<TModel, TSearch>(objList, totalItems) { IsSuccess = true, SuccessMessage = sucessMessage };
+            return new ReturnListWithSearchModel<TModel, TSearch>(objList, totalItems) { IsSuccess = true, SuccessMessage = sucessMessage, HttpCode = httpCode };
         }
 
-        public static ReturnListWithSearchModel<TModel, TSearch> Success(List<TModel> objList, string sucessMessage = null)
+        public static ReturnListWithSearchModel<TModel, TSearch> Success(List<TModel> objList, string sucessMessage = null, int httpCode = 200)
         {
-            return new ReturnListWithSearchModel<TModel, TSearch>(objList, objList.Count) { IsSuccess = true, SuccessMessage = sucessMessage };
+            return new ReturnListWithSearchModel<TModel, TSearch>(objList, objList.Count) { IsSuccess = true, SuccessMessage = sucessMessage, HttpCode = httpCode };
         }
 
         public static ReturnListWithSearchModel<TModel, TSearch> Error(Exception ex, int httpCode = 200)

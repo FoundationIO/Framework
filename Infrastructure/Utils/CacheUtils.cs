@@ -24,9 +24,9 @@ namespace Microsoft.Extensions.Caching.Distributed
             return result.FromByteArray<T>();
         }
 
-        public static async Task SetAsync<T>(this IDistributedCache distributedCache, string key, T value, DistributedCacheEntryOptions options, CancellationToken token = default(CancellationToken))
+        public static Task SetAsync<T>(this IDistributedCache distributedCache, string key, T value, DistributedCacheEntryOptions options, CancellationToken token = default(CancellationToken))
         {
-            await distributedCache.SetAsync(key, value.ToByteArray(), options, token);
+            return distributedCache.SetAsync(key, value.ToByteArray(), options, token);
         }
 
         public static async Task<T> GetAsync<T>(this IDistributedCache distributedCache, string key, CancellationToken token = default(CancellationToken))

@@ -8,6 +8,7 @@ using System;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading.Tasks;
 using Framework.Infrastructure.Interfaces.Services;
 using Framework.Infrastructure.Models.Result;
 using Framework.Infrastructure.Utils;
@@ -61,6 +62,11 @@ namespace Framework.Infrastructure.Services
             {
                 return new ReturnModel<bool>("Unexpected error when sending email.", ex);
             }
+        }
+
+        public Task<ReturnModel<bool>> SendAsync(string smtpHost, int port, string userName, string password, bool useSSL, string fromDisplayName, string fromEmail, string toDisplayName, string toEmail, string ccEmail, string bccEmail, string subject, string body)
+        {
+            return Task.Run<ReturnModel<bool>>(() => Send(smtpHost, port, userName, password, useSSL, fromDisplayName, fromEmail, toDisplayName, toEmail, ccEmail, bccEmail, subject, body));
         }
     }
 }
