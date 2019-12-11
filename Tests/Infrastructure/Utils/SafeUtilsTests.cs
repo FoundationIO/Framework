@@ -22,108 +22,115 @@ namespace Framework.Infrastructure.Utils.Tests
             Assert.IsTrue(SafeUtils.Int("0199", 121) == 199);
         }
 
-/*
         [TestMethod]
         public void BoolTest()
         {
-
+            Assert.IsTrue(!SafeUtils.Bool("a"));
+            Assert.IsTrue(!SafeUtils.Bool(null));
+            Assert.IsTrue(SafeUtils.Bool("y"));
+            Assert.IsTrue(SafeUtils.Bool("Y"));
+            Assert.IsTrue(SafeUtils.Bool("Yes"));
+            Assert.IsTrue(!SafeUtils.Bool("n"));
+            Assert.IsTrue(!SafeUtils.Bool("N"));
+            Assert.IsTrue(!SafeUtils.Bool("No"));
         }
 
-        [TestMethod]
-        public void BoolTest1()
-        {
+        /*
+                [TestMethod]
+                public void BoolTest1()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void UShortTest()
-        {
+                [TestMethod]
+                public void UShortTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void ShortTest()
-        {
+                [TestMethod]
+                public void ShortTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void LongTest()
-        {
+                [TestMethod]
+                public void LongTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void DecimalTest()
-        {
+                [TestMethod]
+                public void DecimalTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void FloatTest()
-        {
+                [TestMethod]
+                public void FloatTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void DoubleTest()
-        {
+                [TestMethod]
+                public void DoubleTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void EnumTest()
-        {
+                [TestMethod]
+                public void EnumTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void EnumTest1()
-        {
+                [TestMethod]
+                public void EnumTest1()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void EnumTest2()
-        {
+                [TestMethod]
+                public void EnumTest2()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void EnumTest3()
-        {
+                [TestMethod]
+                public void EnumTest3()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void GuidTest()
-        {
+                [TestMethod]
+                public void GuidTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void GuidTest1()
-        {
+                [TestMethod]
+                public void GuidTest1()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void DateTimeTest()
-        {
+                [TestMethod]
+                public void DateTimeTest()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void DateTimeTest1()
-        {
+                [TestMethod]
+                public void DateTimeTest1()
+                {
 
-        }
+                }
 
-        [TestMethod]
-        public void DateTimeTest2()
-        {
+                [TestMethod]
+                public void DateTimeTest2()
+                {
 
-        }
-*/
+                }
+        */
     }
 }

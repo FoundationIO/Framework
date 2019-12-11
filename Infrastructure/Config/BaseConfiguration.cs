@@ -147,6 +147,8 @@ namespace Framework.Infrastructure.Config
                 childDbInfo.MaxPoolSize = SafeUtils.Int(child["maxPoolSize"], 1000);
                 childDbInfo.AdditionalParameters = child["additionalParameters"] ?? "";
 
+                childDbInfo.AlwaysCreateNewDatabase = SafeUtils.Bool(child["alwaysCreateNewDatabase"], false);
+
                 childDbInfo.MigrationNamespace = child["migrationNamespace"] ?? "";
                 childDbInfo.MigrationProfile = child["migrationProfile"] ?? "";
 

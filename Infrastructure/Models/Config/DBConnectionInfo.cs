@@ -28,6 +28,8 @@ namespace Framework.Infrastructure.Models.Config
 
         public string AdditionalParameters { get; set; }
 
+        public bool AlwaysCreateNewDatabase { get; set; } = false;
+
         public string MigrationProfile { get; set; }
 
         public string MigrationNamespace { get; set; }

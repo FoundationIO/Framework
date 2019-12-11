@@ -14,6 +14,11 @@ namespace Framework.Infrastructure.Models.Result
     public class ReturnListWithSearchModel<TModel, TSearch> : IReturnModel
         where TSearch : class
     {
+        public ReturnListWithSearchModel()
+        {
+            IsSuccess = false;
+        }
+
         public ReturnListWithSearchModel(TSearch search, List<TModel> items, long totalItems, int httpCode = 200)
         {
             Model = items;
@@ -47,7 +52,10 @@ namespace Framework.Infrastructure.Models.Result
             Search = search;
             IsSuccess = false;
             HttpCode = httpCode;
-            ErrorHolder = new ReturnError(ex);
+            if (ex != null)
+            {
+                ErrorHolder = new ReturnError(ex);
+            }
         }
 
         public ReturnListWithSearchModel(TSearch search, string errorMsg, Exception ex = null, int httpCode = 200)

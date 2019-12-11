@@ -11,8 +11,15 @@ using Framework.Infrastructure.Exceptions;
 
 namespace Framework.Infrastructure.Models.Result
 {
+    [Serializable]
     public class ReturnModel<T> : IReturnModel
     {
+        public ReturnModel()
+        {
+            IsSuccess = false;
+            HttpCode = 200;
+        }
+
         public ReturnModel(T result, int httpCode = 200)
         {
             Model = result;

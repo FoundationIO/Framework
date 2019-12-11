@@ -49,7 +49,7 @@ namespace Framework.Data.DbAccess
             return config.ConnectionSettings[currentProfile];
         }
 
-        public virtual string GetConnectionString(string currentProfile)
+        public virtual string GetConnectionString(string currentProfile, bool useMasterDB = false)
         {
             if (!config.ConnectionSettings.Keys.Any(x => x == currentProfile))
             {
@@ -63,23 +63,42 @@ namespace Framework.Data.DbAccess
             var connectionStr = string.Empty;
 
             var dbType = (dbConnectionInfo.DatabaseType ?? string.Empty).Trim().ToLower();
+            var dbName = dbConnectionInfo.DatabaseName;
+            if (useMasterDB)
+            {
+                switch (dbType)
+                {
+                    case DBType.MYSQL:
+                        {
+                            dbName = "sys";
+                            break;
+                        }
+
+                    case DBType.SQLSERVER:
+                        {
+                            dbName = "master";
+                            break;
+                        }
+                }
+            }
+
             switch (dbType)
             {
                 case DBType.MYSQL:
                     {
                         if (dbConnectionInfo.DatabaseUseIntegratedLogin)
-                            connectionStr = $"IntegratedSecurity=yes;Server={dbConnectionInfo.DatabaseServer};Database={dbConnectionInfo.DatabaseName};";
+                            connectionStr = $"IntegratedSecurity=yes;Server={dbConnectionInfo.DatabaseServer};Database={dbName};";
                         else
-                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Database={dbConnectionInfo.DatabaseName};Uid={dbConnectionInfo.DatabaseUserName};Pwd={dbConnectionInfo.DatabasePassword};";
+                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Database={dbName};Uid={dbConnectionInfo.DatabaseUserName};Pwd={dbConnectionInfo.DatabasePassword};";
                         break;
                     }
 
                 case DBType.SQLSERVER:
                     {
                         if (dbConnectionInfo.DatabaseUseIntegratedLogin)
-                            connectionStr = $"Integrated Security=true;Server={dbConnectionInfo.DatabaseServer};Initial Catalog={dbConnectionInfo.DatabaseName};Persist Security Info=True;MultipleActiveResultSets =False;Application Name={config.AppName};Max Pool Size={workerThreads};";
+                            connectionStr = $"Integrated Security=true;Server={dbConnectionInfo.DatabaseServer};Initial Catalog={dbName};Persist Security Info=True;MultipleActiveResultSets =False;Application Name={config.AppName};Max Pool Size={workerThreads};";
                         else
-                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Initial Catalog={dbConnectionInfo.DatabaseName};Persist Security Info=True;User ID={dbConnectionInfo.DatabaseUserName};Password={dbConnectionInfo.DatabasePassword};MultipleActiveResultSets=False;Application Name={config.AppName};Max Pool Size={workerThreads};";
+                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Initial Catalog={dbName};Persist Security Info=True;User ID={dbConnectionInfo.DatabaseUserName};Password={dbConnectionInfo.DatabasePassword};MultipleActiveResultSets=False;Application Name={config.AppName};Max Pool Size={workerThreads};";
                         break;
                     }
 
@@ -98,9 +117,9 @@ namespace Framework.Data.DbAccess
             return connectionStr;
         }
 
-        public virtual string GetConnectionString()
+        public virtual string GetConnectionString(bool useMasterDB = false)
         {
-            return GetConnectionString(profileName);
+            return GetConnectionString(profileName, useMasterDB);
         }
 
         public virtual MigrationProcessorFactory GetMigrationProcessorFactory()

@@ -14,6 +14,11 @@ namespace Framework.Infrastructure.Models.Result
     public class ReturnListModel<TModel> : ReturnListWithSearchModel
         <TModel, BaseSearchCriteria>
     {
+        public ReturnListModel()
+            : base()
+        {
+        }
+
         public ReturnListModel(List<TModel> items, long totalItems, int httpCode = 200)
             : base(null, items, totalItems, httpCode)
         {

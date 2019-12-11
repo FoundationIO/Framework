@@ -5,6 +5,7 @@ This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
 using System;
+using System.Text.Json.Serialization;
 
 namespace Framework.Infrastructure.Models.Search
 {
@@ -29,10 +30,13 @@ namespace Framework.Infrastructure.Models.Search
 
         public bool SortAscending { get; set; }
 
+        [JsonIgnore]
         public int CurrentRows { get; set; }
 
+        [JsonIgnore]
         public long TotalRowCount { get; set; }
 
+        [JsonIgnore]
         public int NumericPageCount { get; set; }
 
         public int CurrentPageStartRow()

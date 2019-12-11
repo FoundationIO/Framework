@@ -30,15 +30,23 @@ namespace Framework.Data.Migrations
             dbSettings = dbInfo.GetDbSettings();
         }
 
-        public bool IsMigrationUptoDate()
+        public bool IsMigrationUptoDate(Assembly migrationAssembly = null)
         {
             var announcer = new TextWriterAnnouncer(x => System.Diagnostics.Debug.WriteLine(x));
-            var assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
+            Assembly assembly;
 
-            if (assembly == null)
+            if (migrationAssembly == null)
             {
-                log.Error($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
-                throw new Exception($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
+                if (assembly == null)
+                {
+                    log.Error($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                    throw new Exception($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                }
+            }
+            else
+            {
+                assembly = migrationAssembly;
             }
 
             var migrationContext = new RunnerContext(announcer)
@@ -62,15 +70,23 @@ namespace Framework.Data.Migrations
             return true;
         }
 
-        public bool MigrateToLatestVersion()
+        public bool MigrateToLatestVersion(Assembly migrationAssembly = null)
         {
             var announcer = new TextWriterAnnouncer(s => log.Info(s));
-            var assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
+            Assembly assembly;
 
-            if (assembly == null)
+            if (migrationAssembly == null)
             {
-                log.Error($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
-                throw new Exception($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                assembly = GetMigrationAssembly(dbSettings.MigrationNamespace);
+                if (assembly == null)
+                {
+                    log.Error($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                    throw new Exception($"Unable to find the namespace {dbSettings.MigrationNamespace} in the loaded assemblies");
+                }
+            }
+            else
+            {
+                assembly = migrationAssembly;
             }
 
             var migrationContext = new RunnerContext(announcer)
@@ -90,12 +106,18 @@ namespace Framework.Data.Migrations
             return true;
         }
 
+        public abstract Assembly GetMigrationAssembly();
+
         private Assembly GetMigrationAssembly(string migrationNamespace)
         {
-            //var alist = from a in AppDomain.CurrentDomain.GetAssemblies() select a.Location;
-            //log.Info($"assembly list = {alist.Count()}");
+            var alist = from a in AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != "Microsoft.IntelliTrace.Core") select a;
 
-            var qry = from a in AppDomain.CurrentDomain.GetAssemblies()
+            foreach (var item in alist)
+            {
+                log.Info($"assembly  = {item.FullName}");
+            }
+
+            var qry = from a in AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName != "Microsoft.IntelliTrace.Core")
                       from t in a.GetTypes()
                       where t.Namespace != null && t.Namespace.ToLower().Equals(migrationNamespace.ToLower().Trim())
                       select a;

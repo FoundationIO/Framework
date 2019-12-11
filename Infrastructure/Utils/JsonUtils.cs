@@ -10,9 +10,27 @@ namespace Framework.Infrastructure.Utils
 {
     public static class JsonUtils
     {
-        public static T Deserialize<T>(string jsonStr)
+        public static T DeserializeWithoutPropertyNaming<T>(string jsonStr)
         {
             return JsonSerializer.Deserialize<T>(jsonStr);
+        }
+
+        public static string SerializeWithoutPropertyNaming<T>(T obj, bool formatted = false)
+        {
+            return JsonSerializer.Serialize<T>(obj, new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+                WriteIndented = formatted
+            });
+        }
+
+        public static T Deserialize<T>(string jsonStr)
+        {
+            return JsonSerializer.Deserialize<T>(jsonStr, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IgnoreNullValues = true,
+            });
         }
 
         public static string Serialize<T>(T obj, bool formatted = false)
