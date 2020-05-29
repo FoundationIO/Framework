@@ -26,13 +26,13 @@ namespace Framework.Infrastructure.Utils
             return ReflectionUtils.GetValueFromString<T>(resultStr, defaultValue);
         }
 
-        public static string GetConfigFileName(string baseConfigFileName)
+        public static string GetConfigFileName(string baseConfigFileName, bool useCurrentDirectory = false)
         {
             string path;
             var dir = "..";
             for (int i = 0; i < 8; ++i)
             {
-                path = FileUtils.GetApplicationExeDirectory();
+                path = useCurrentDirectory ? FileUtils.GetCurrentDirectory() : FileUtils.GetApplicationExeDirectory();
                 for (int j = 0; j < i; ++j)
                 {
                     path = FileUtils.Combine(path, dir);
@@ -48,7 +48,7 @@ namespace Framework.Infrastructure.Utils
 
             for (int i = 0; i < 8; ++i)
             {
-                path = FileUtils.GetApplicationExeDirectory();
+                path = useCurrentDirectory ? FileUtils.GetCurrentDirectory() : FileUtils.GetApplicationExeDirectory();
                 for (int j = 0; j < i; ++j)
                 {
                     path = FileUtils.Combine(path, dir);

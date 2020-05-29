@@ -5,6 +5,7 @@ This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
 using System.Text.Json.Serialization;
+using Framework.Infrastructure.Exceptions;
 
 namespace Framework.Infrastructure.Models.Result
 {
@@ -16,5 +17,7 @@ namespace Framework.Infrastructure.Models.Result
         bool IsSuccess { get; set; }
 
         string SuccessMessage { get; set; }
+
+        ReturnError ErrorHolder { get; set; }
     }
 }

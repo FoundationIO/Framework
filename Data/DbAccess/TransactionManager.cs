@@ -21,16 +21,12 @@ namespace Framework.Data.DbAccess
 
         public ITransaction BeginTransaction(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified)
         {
-            var trx = new Transaction(dbManager, dBTransactionIsolationLevel);
-            trx.BeginTransaction();
-            return trx;
+            return dbManager.BeginTransactionWithTransactionManager(dBTransactionIsolationLevel);
         }
 
-        public async Task<ITransaction> BeginTransactionAsync(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified)
+        public Task<ITransaction> BeginTransactionAsync(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified)
         {
-            var trx = new Transaction(dbManager, dBTransactionIsolationLevel);
-            await trx.BeginTransactionAsync();
-            return trx;
+            return dbManager.BeginTransactionWithTransactionManagerAsync(dBTransactionIsolationLevel);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Framework.Infrastructure.Utils
 
         public bool IsPreamble()
         {
-            byte[] preamble = this.CurrentEncoding.GetPreamble();
+            var preamble = this.CurrentEncoding.GetPreamble();
             bool res = true;
             for (int i = 0; i < preamble.Length; i++)
             {
@@ -58,7 +58,7 @@ namespace Framework.Infrastructure.Utils
 
         public override string ReadLine()
         {
-            string line = base.ReadLine();
+            var line = base.ReadLine();
             if (line != null)
             {
                 _position += CurrentEncoding.GetByteCount(line);

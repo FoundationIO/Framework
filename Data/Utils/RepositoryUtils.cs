@@ -19,7 +19,7 @@ namespace Framework.Data.Utils
 {
     public static class RepositoryUtils
     {
-        public static void UpdateAuditInfo(this IAuditableModel model, string createdBy, string modifiedBy)
+        public static void UpdateAuditInfo(this IAuditableNameModel model, string createdBy, string modifiedBy)
         {
             model.CreatedBy = createdBy;
             model.CreatedDate = DateTime.UtcNow;
@@ -27,7 +27,7 @@ namespace Framework.Data.Utils
             model.ModifiedDate = DateTime.UtcNow;
         }
 
-        public static void UpdateModifiedAuditInfo(this IAuditableModel model, string modifiedBy)
+        public static void UpdateModifiedAuditInfo(this IAuditableNameModel model, string modifiedBy)
         {
             model.ModifiedBy = modifiedBy;
             model.ModifiedDate = DateTime.UtcNow;
@@ -35,7 +35,7 @@ namespace Framework.Data.Utils
 
         public static async Task<DbReturnListModel<T>> ReturnListModelResultAsync<T>(this IQueryable<T> sql, IBaseSearchCriteria baseSearchCriteria)
         {
-            return new DbReturnListModel<T>(await sql.AsQueryable().ApplyPaging(baseSearchCriteria.Page, baseSearchCriteria.PageSize).ToListAsync(), await sql.AsQueryable().LongCountAsync());
+            return new DbReturnListModel<T>(await sql.AsQueryable().ApplySortingOrderBy(baseSearchCriteria.SortBy, baseSearchCriteria.SortAscending).ApplyPaging(baseSearchCriteria.Page, baseSearchCriteria.PageSize).ToListAsync(), await sql.AsQueryable().LongCountAsync());
         }
 
         public static async Task<DbReturnListModel<T>> ReturnListModelResultAsync<T>(this IQueryable<T> sql)
@@ -46,7 +46,7 @@ namespace Framework.Data.Utils
 
         public static DbReturnListModel<T> ReturnListModelResult<T>(this IQueryable<T> sql, IBaseSearchCriteria baseSearchCriteria)
         {
-            return new DbReturnListModel<T>(sql.AsQueryable().ApplyPaging(baseSearchCriteria.Page, baseSearchCriteria.PageSize).ToList(), sql.AsQueryable().LongCount());
+            return new DbReturnListModel<T>(sql.AsQueryable().ApplySortingOrderBy(baseSearchCriteria.SortBy, baseSearchCriteria.SortAscending).ApplyPaging(baseSearchCriteria.Page, baseSearchCriteria.PageSize).ToList(), sql.AsQueryable().LongCount());
         }
 
         public static DbReturnListModel<T> ReturnListModelResult<T>(this IQueryable<T> sql)

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Framework.Infrastructure.Utils
 {
@@ -89,7 +90,7 @@ namespace Framework.Infrastructure.Utils
 
         public static Expression<Func<T, bool>> AddFilterToStringProperty<T>(Expression<Func<T, string>> expression, string filter, string fiterFunctionName)
         {
-            var notNullExpresion = Expression.NotEqual(expression.Body,Expression.Constant(null));
+            var notNullExpresion = Expression.NotEqual(expression.Body, Expression.Constant(null));
 
             var methodExpresion = Expression.Call(
                     expression.Body,
@@ -99,6 +100,64 @@ namespace Framework.Infrastructure.Utils
 
             var filterExpresion = Expression.AndAlso(notNullExpresion, methodExpresion);
             return Expression.Lambda<Func<T, bool>>(filterExpresion, expression.Parameters);
+        }
+
+        public static IQueryable<T> ApplySorting<T>(this IQueryable<T> expression, string column, bool isAsc)
+        {
+            var param = Expression.Parameter(typeof(T), typeof(T).Name);
+            Expression<Func<T, object>> orderExpression;
+            try
+            {
+                orderExpression = Expression.Lambda<Func<T, object>>(Expression.Property(param, column), param);
+            }
+            catch
+            {
+                return expression;
+            }
+
+            if (orderExpression == null)
+                return expression;
+
+            return isAsc ? expression.OrderBy(orderExpression) : expression.OrderByDescending(orderExpression);
+        }
+
+        public static IOrderedQueryable<TSource> ApplySortingOrderBy<TSource>(this IQueryable<TSource> query, string propertyName,bool isAsc)
+        {
+            try
+            {
+                var entityType = typeof(TSource);
+                var propertyInfo = entityType.GetProperty(propertyName);
+
+                ParameterExpression parameterExpression = Expression.Parameter(entityType, "x");
+                MemberExpression property = Expression.Property(parameterExpression, propertyName);
+
+                var selector = Expression.Lambda(property, new ParameterExpression[] { parameterExpression });
+                var enumarableType = typeof(System.Linq.Queryable);
+                var method = GetMethodInfo(isAsc, enumarableType).Single();
+
+                MethodInfo genericMethod = method
+                     .MakeGenericMethod(entityType, propertyInfo.PropertyType);
+
+                var newQuery = (IOrderedQueryable<TSource>)genericMethod
+                     .Invoke(genericMethod, new object[] { query, selector });
+
+                return newQuery;
+            }
+            catch
+            {
+                return (IOrderedQueryable<TSource>)query;
+            }
+        }
+
+        private static IEnumerable<MethodInfo> GetMethodInfo(bool isAsc, Type enumarableType)
+        {
+            return enumarableType.GetMethods()
+                             .Where(m => m.Name == (isAsc ? "OrderBy" : "OrderByDescending") && m.IsGenericMethodDefinition)
+                             .Where(m =>
+                             {
+                                 var parameters = m.GetParameters().ToList();
+                                 return parameters.Count == 2;
+                             });
         }
     }
 }

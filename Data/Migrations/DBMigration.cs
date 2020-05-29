@@ -14,6 +14,7 @@ using Framework.Data.DbAccess;
 using Framework.Infrastructure.Logging;
 using Framework.Infrastructure.Models.Config;
 #pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Framework.Data.Migrations
 {
@@ -125,4 +126,5 @@ namespace Framework.Data.Migrations
         }
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS0612 // Type or member is obsolete

@@ -14,6 +14,12 @@ namespace Framework.Infrastructure.Models.Result
         {
         }
 
+        public DbReturnListModel(List<T> result)
+        {
+            this.Result = result;
+            this.TotalRows = result.Count;
+        }
+
         public DbReturnListModel(List<T> result, long totalRows)
         {
             this.Result = result;

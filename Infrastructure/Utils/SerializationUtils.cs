@@ -18,7 +18,7 @@ namespace Framework.Infrastructure.Utils
                 return (byte[])null;
             }
 
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            var binaryFormatter = new BinaryFormatter();
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 binaryFormatter.Serialize(memoryStream, obj);
@@ -34,7 +34,7 @@ namespace Framework.Infrastructure.Utils
                 return default(T);
             }
 
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            var binaryFormatter = new BinaryFormatter();
             using (MemoryStream memoryStream = new MemoryStream(byteArray))
             {
                 return binaryFormatter.Deserialize(memoryStream) as T;

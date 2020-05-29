@@ -56,7 +56,6 @@
     <Rule Id="CA2229" Action="Warning" />
     <Rule Id="CA2231" Action="Warning" />
     <Rule Id="CA2232" Action="Warning" />
-    <Rule Id="CA2235" Action="Warning" />
     <Rule Id="CA2236" Action="Warning" />
     <Rule Id="CA2237" Action="Warning" />
     <Rule Id="CA2238" Action="Warning" />
@@ -78,6 +77,9 @@
   </Rules>
   <Rules AnalyzerId="Microsoft.CodeAnalysis.Features" RuleNamespace="Microsoft.CodeAnalysis.Features">
     <Rule Id="IDE0067" Action="Error" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
+    <Rule Id="CA2235" Action="None" />
   </Rules>
   <Rules AnalyzerId="Puma.Security.Rules" RuleNamespace="Puma.Security.Rules">
     <Rule Id="SEC0029" Action="None" />

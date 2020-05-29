@@ -36,11 +36,11 @@ namespace Framework.Infrastructure.Utils
     /// www: http://crackstation.net/hashing-security.htm
     /// Compatibility: .NET 3.0 and later.
     /// </summary>
-    public static class PasswordHash
+    public static class PasswordUtils
     {
         // The following constants may be changed without breaking existing hashes.
-        public const int SALTBYTESIZE = 24;
-        public const int HASHBYTESIZE = 24;
+        public const int SALTBYTESIZE = 32; //256bit
+        public const int HASHBYTESIZE = 64; //512bit
         public const int PBKDF2ITERATIONS = 1000;
 
         public const int ITERATIONINDEX = 0;

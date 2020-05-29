@@ -33,37 +33,52 @@ namespace Framework.Infrastructure.Config
 
         DistributedCacheEntryOptions CacheHighRefreshOption()
         {
+            return new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = CacheHighRefreshRelativeTime()
+            };
+        }
+
+        TimeSpan CacheHighRefreshRelativeTime()
+        {
             var time = CacheHighRefreshInMinutes;
             if (time == 0)
                 time = 5;
-            return new DistributedCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = new TimeSpan(0, time, 0)
-            };
+            return new TimeSpan(0, time, 0);
         }
 
         DistributedCacheEntryOptions CachMediumRefreshOption()
         {
-            var time = CachMediumRefreshInMinutes;
-            if (time == 0)
-                time = 5;
-
             return new DistributedCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = new TimeSpan(0, time, 0)
+                AbsoluteExpirationRelativeToNow = CachMediumRefreshRelativeTime()
             };
+        }
+
+        TimeSpan CachMediumRefreshRelativeTime()
+        {
+            var time = CachMediumRefreshInMinutes;
+            if (time == 0)
+                time = 15;
+
+            return new TimeSpan(0, time, 0);
         }
 
         DistributedCacheEntryOptions CachLowRefreshOption()
         {
-            var time = CachLowRefreshInMinutes;
-            if (time == 0)
-                time = 5;
-
             return new DistributedCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = new TimeSpan(0, time, 0)
+                AbsoluteExpirationRelativeToNow = CachLowRefreshRelativeTime()
             };
+        }
+
+        TimeSpan CachLowRefreshRelativeTime()
+        {
+            var time = CachLowRefreshInMinutes;
+            if (time == 0)
+                time = 60;
+
+            return new TimeSpan(0, time, 0);
         }
     }
 }

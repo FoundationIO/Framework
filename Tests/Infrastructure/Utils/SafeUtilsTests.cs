@@ -17,7 +17,7 @@ namespace Framework.Infrastructure.Utils.Tests
             Assert.IsTrue(SafeUtils.Int("a", 199) == 199);
             Assert.IsTrue(SafeUtils.Int("", 199) == 199);
             Assert.IsTrue(SafeUtils.Int(" ", 199) == 199);
-            Assert.IsTrue(SafeUtils.Int(null, 121) == 121);
+            Assert.IsTrue(SafeUtils.Int((string)null, 121) == 121);
             Assert.IsTrue(SafeUtils.Int("199", 121) == 199);
             Assert.IsTrue(SafeUtils.Int("0199", 121) == 199);
         }

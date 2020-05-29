@@ -121,6 +121,20 @@ namespace Framework.Data.DbAccess
             return currentTransactionCount;
         }
 
+        public ITransaction BeginTransactionWithTransactionManager(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified)
+        {
+            var trx = new Transaction(this, dBTransactionIsolationLevel);
+            trx.BeginTransaction();
+            return trx;
+        }
+
+        public async Task<ITransaction> BeginTransactionWithTransactionManagerAsync(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified)
+        {
+            var trx = new Transaction(this, dBTransactionIsolationLevel);
+            await trx.BeginTransactionAsync();
+            return trx;
+        }
+
         public int Delete<T>(Expression<Func<T, bool>> where)
             where T : class
         {
@@ -131,6 +145,13 @@ namespace Framework.Data.DbAccess
             where T : class
         {
             return this.Connection.InsertWithIdentity<T>(obj);
+        }
+
+        public TKey Insert<T, TKey>(T obj)
+            where T : class
+            where TKey : struct
+        {
+            return (TKey)Convert.ChangeType(Insert(obj), typeof(TKey));
         }
 
         public void Insert<T>(IEnumerable<T> objs)
@@ -145,9 +166,9 @@ namespace Framework.Data.DbAccess
         public object InsertWithAudit<T>(T obj, string createdBy)
             where T : class
         {
-            if (obj is IAuditableModel)
+            if (obj is IAuditableNameModel)
             {
-                var aModel = obj as IAuditableModel;
+                var aModel = obj as IAuditableNameModel;
                 aModel.CreatedBy = createdBy;
                 aModel.CreatedDate = DateTime.UtcNow;
                 aModel.ModifiedBy = createdBy;
@@ -155,6 +176,35 @@ namespace Framework.Data.DbAccess
             }
 
             return this.Connection.InsertWithIdentity<T>(obj);
+        }
+
+        public TKey InsertWithAudit<T, TKey>(T obj, string createdBy)
+            where T : class
+            where TKey : struct
+        {
+            return (TKey)Convert.ChangeType(InsertWithAudit(obj, createdBy), typeof(TKey));
+        }
+
+        public object InsertWithAudit<T>(T obj, long? createdBy)
+            where T : class
+        {
+            if (obj is IAuditableIdModel)
+            {
+                var aModel = obj as IAuditableIdModel;
+                aModel.CreatedBy = createdBy;
+                aModel.CreatedDate = DateTime.UtcNow;
+                aModel.ModifiedBy = createdBy;
+                aModel.ModifiedDate = aModel.CreatedDate;
+            }
+
+            return this.Connection.InsertWithIdentity<T>(obj);
+        }
+
+        public TKey InsertWithAudit<T, TKey>(T obj, long? createdBy)
+            where T : class
+            where TKey : struct
+        {
+            return (TKey)Convert.ChangeType(InsertWithAudit(obj, createdBy), typeof(TKey));
         }
 
         public void InsertWithAudit<T>(IEnumerable<T> objs, string createdBy)
@@ -166,41 +216,81 @@ namespace Framework.Data.DbAccess
             }
         }
 
-        public void Update<T>(T obj)
-            where T : class
-        {
-            Connection.Update<T>(obj);
-        }
-
-        public void Update<T>(IEnumerable<T> objs)
+        public void InsertWithAudit<T>(IEnumerable<T> objs, long? createdBy)
             where T : class
         {
             foreach (var obj in objs)
             {
-                Update(obj);
+                InsertWithAudit(obj, createdBy);
             }
         }
 
-        public void UpdateWithAudit<T>(T obj, string modifiedBy)
+        public bool Update<T>(T obj)
             where T : class
         {
-            if (obj is IAuditableModel)
+            return Connection.Update<T>(obj) > 0;
+        }
+
+        public bool Update<T>(IEnumerable<T> objs)
+            where T : class
+        {
+            var updated = true;
+            foreach (var obj in objs)
             {
-                var aModel = obj as IAuditableModel;
+                updated = updated && Update(obj);
+            }
+
+            return updated;
+        }
+
+        public bool UpdateWithAudit<T>(T obj, string modifiedBy)
+            where T : class
+        {
+            if (obj is IAuditableNameModel)
+            {
+                var aModel = obj as IAuditableNameModel;
                 aModel.ModifiedDate = aModel.CreatedDate;
                 aModel.ModifiedBy = modifiedBy;
             }
 
-            Connection.Update<T>(obj);
+            return Connection.Update<T>(obj) > 0;
         }
 
-        public void UpdateWithAudit<T>(IEnumerable<T> objs, string modifiedBy)
+        public bool UpdateWithAudit<T>(T obj, long? modifiedBy)
             where T : class
         {
+            if (obj is IAuditableIdModel)
+            {
+                var aModel = obj as IAuditableIdModel;
+                aModel.ModifiedDate = aModel.CreatedDate;
+                aModel.ModifiedBy = modifiedBy;
+            }
+
+            return Connection.Update<T>(obj) > 0;
+        }
+
+        public bool UpdateWithAudit<T>(IEnumerable<T> objs, string modifiedBy)
+            where T : class
+        {
+            var updated = true;
             foreach (var obj in objs)
             {
-                UpdateWithAudit(obj, modifiedBy);
+                updated = updated && UpdateWithAudit(obj, modifiedBy);
             }
+
+            return updated;
+        }
+
+        public bool UpdateWithAudit<T>(IEnumerable<T> objs, long? modifiedBy)
+            where T : class
+        {
+            var updated = true;
+            foreach (var obj in objs)
+            {
+                updated = updated && UpdateWithAudit(obj, modifiedBy);
+            }
+
+            return updated;
         }
 
         public T First<T>(Expression<Func<T, bool>> predicate)
@@ -278,7 +368,7 @@ namespace Framework.Data.DbAccess
                 totalItems = GetTable<T>().LongCount();
             }
 
-            return new DbReturnListModel<T>(querable.ToList(),totalItems);
+            return new DbReturnListModel<T>(querable.ToList(), totalItems);
         }
 
         public List<T> SelectByPage<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
@@ -300,13 +390,29 @@ namespace Framework.Data.DbAccess
             return querable.ToList();
         }
 
-        public void InsertAll<T>(List<T> list)
+        public List<object> InsertAll<T>(List<T> list)
             where T : class
         {
+            var lst = new List<object>();
             foreach (var item in list)
             {
-                Insert(item);
+                lst.Add(Insert(item));
             }
+
+            return lst;
+        }
+
+        public List<TKey> InsertAll<T, TKey>(List<T> list)
+            where T : class
+            where TKey : struct
+        {
+            var lst = new List<TKey>();
+            foreach (var itemKey in InsertAll<T>(list))
+            {
+                lst.Add((TKey)itemKey);
+            }
+
+            return lst;
         }
 
         //Async Methods
@@ -364,21 +470,44 @@ namespace Framework.Data.DbAccess
             return this.Connection.InsertWithIdentityAsync<T>(obj);
         }
 
-        public async Task InsertAsync<T>(IEnumerable<T> objs)
+        public async Task<TKey> InsertAsync<T, TKey>(T obj)
+            where T : class
+            where TKey : struct
+        {
+            return (TKey)Convert.ChangeType(await this.Connection.InsertWithIdentityAsync<T>(obj), typeof(TKey));
+        }
+
+        public async Task<List<object>> InsertAsync<T>(IEnumerable<T> objs)
             where T : class
         {
+            var lst = new List<object>();
             foreach (var obj in objs)
             {
-                await InsertAsync(obj);
+                lst.Add(await InsertAsync(obj));
             }
+
+            return lst;
+        }
+
+        public async Task<List<TKey>> InsertAsync<T, TKey>(IEnumerable<T> objs)
+            where T : class
+            where TKey : struct
+        {
+            var lst = new List<TKey>();
+            foreach (var objkey in await InsertAsync<T>(objs))
+            {
+                lst.Add((TKey)Convert.ChangeType(objkey, typeof(TKey)));
+            }
+
+            return lst;
         }
 
         public Task<object> InsertWithAuditAsync<T>(T obj, string createdBy)
             where T : class
         {
-            if (obj is IAuditableModel)
+            if (obj is IAuditableNameModel)
             {
-                var aModel = obj as IAuditableModel;
+                var aModel = obj as IAuditableNameModel;
                 aModel.CreatedBy = createdBy;
                 aModel.CreatedDate = DateTime.UtcNow;
                 aModel.ModifiedBy = createdBy;
@@ -388,50 +517,152 @@ namespace Framework.Data.DbAccess
             return this.Connection.InsertWithIdentityAsync<T>(obj);
         }
 
-        public async Task InsertWithAuditAsync<T>(IEnumerable<T> objs, string createdBy)
+        public async Task<TKey> InsertWithAuditAsync<T, TKey>(T obj, string createdBy)
+            where T : class
+            where TKey : struct
+        {
+            return (TKey)Convert.ChangeType(await InsertWithAuditAsync<T>(obj, createdBy), typeof(TKey));
+        }
+
+        public Task<object> InsertWithAuditAsync<T>(T obj, long? createdBy)
             where T : class
         {
+            if (obj is IAuditableIdModel)
+            {
+                var aModel = obj as IAuditableIdModel;
+                aModel.CreatedBy = createdBy;
+                aModel.CreatedDate = DateTime.UtcNow;
+                aModel.ModifiedBy = createdBy;
+                aModel.ModifiedDate = aModel.CreatedDate;
+            }
+
+            return this.Connection.InsertWithIdentityAsync<T>(obj);
+        }
+
+        public async Task<TKey> InsertWithAuditAsync<T, TKey>(T obj, long? createdBy)
+            where T : class
+            where TKey : struct
+        {
+            return (TKey)Convert.ChangeType(await InsertWithAuditAsync<T>(obj, createdBy), typeof(TKey));
+        }
+
+        public async Task<List<object>> InsertWithAuditAsync<T>(IEnumerable<T> objs, string createdBy)
+            where T : class
+        {
+            var lst = new List<object>();
             foreach (var obj in objs)
             {
-                await InsertWithAuditAsync(obj, createdBy);
+                lst.Add(await InsertWithAuditAsync(obj, createdBy));
             }
+
+            return lst;
         }
 
-        public async Task UpdateAsync<T>(T obj)
+        public async Task<List<TKey>> InsertWithAuditAsync<T, TKey>(IEnumerable<T> objs, string createdBy)
             where T : class
+            where TKey : struct
         {
-            _ = await Connection.UpdateAsync<T>(obj);
-        }
-
-        public async Task UpdateAsync<T>(IEnumerable<T> objs)
-            where T : class
-        {
+            var lst = new List<TKey>();
             foreach (var obj in objs)
             {
-                await UpdateAsync(obj);
+                lst.Add(await InsertWithAuditAsync<T, TKey>(obj, createdBy));
             }
+
+            return lst;
         }
 
-        public async Task UpdateWithAuditAsync<T>(T obj, string modifiedBy)
+        public async Task<List<object>> InsertWithAuditAsync<T>(IEnumerable<T> objs, long? createdBy)
             where T : class
         {
-            if (obj is IAuditableModel)
+            var lst = new List<object>();
+
+            foreach (var obj in objs)
             {
-                var aModel = obj as IAuditableModel;
+                lst.Add(await InsertWithAuditAsync(obj, createdBy));
+            }
+
+            return lst;
+        }
+
+        public async Task<List<TKey>> InsertWithAuditAsync<T, TKey>(IEnumerable<T> objs, long? createdBy)
+           where T : class
+           where TKey : struct
+        {
+            var lst = new List<TKey>();
+            foreach (var obj in objs)
+            {
+                lst.Add(await InsertWithAuditAsync<T, TKey>(obj, createdBy));
+            }
+
+            return lst;
+        }
+
+        public async Task<bool> UpdateAsync<T>(T obj)
+            where T : class
+        {
+            return await Connection.UpdateAsync<T>(obj) > 0;
+        }
+
+        public async Task<bool> UpdateAsync<T>(IEnumerable<T> objs)
+            where T : class
+        {
+            var updated = true;
+            foreach (var obj in objs)
+            {
+                updated = updated && await UpdateAsync(obj);
+            }
+
+            return updated;
+        }
+
+        public async Task<bool> UpdateWithAuditAsync<T>(T obj, string modifiedBy)
+            where T : class
+        {
+            if (obj is IAuditableNameModel)
+            {
+                var aModel = obj as IAuditableNameModel;
                 aModel.ModifiedDate = aModel.CreatedDate;
                 aModel.ModifiedBy = modifiedBy;
             }
 
-            _ = await Connection.UpdateAsync<T>(obj);
+            return await Connection.UpdateAsync<T>(obj) > 0;
         }
 
-        public async Task UpdateWithAuditAsync<T>(IEnumerable<T> objs, string modifiedBy)
+        public async Task<bool> UpdateWithAuditAsync<T>(T obj, long? modifiedBy)
             where T : class
         {
+            if (obj is IAuditableIdModel)
+            {
+                var aModel = obj as IAuditableIdModel;
+                aModel.ModifiedDate = aModel.CreatedDate;
+                aModel.ModifiedBy = modifiedBy;
+            }
+
+            return await Connection.UpdateAsync<T>(obj) > 0;
+        }
+
+        public async Task<bool> UpdateWithAuditAsync<T>(IEnumerable<T> objs, string modifiedBy)
+            where T : class
+        {
+            var updated = true;
             foreach (var obj in objs)
             {
-                await UpdateWithAuditAsync(obj, modifiedBy);
+                updated = updated && await UpdateWithAuditAsync(obj, modifiedBy);
             }
+
+            return updated;
+        }
+
+        public async Task<bool> UpdateWithAuditAsync<T>(IEnumerable<T> objs, long? modifiedBy)
+            where T : class
+        {
+            var updated = true;
+            foreach (var obj in objs)
+            {
+                updated = updated && await UpdateWithAuditAsync(obj, modifiedBy);
+            }
+
+            return updated;
         }
 
         public Task<T> FirstAsync<T>(Expression<Func<T, bool>> predicate)
@@ -526,13 +757,29 @@ namespace Framework.Data.DbAccess
             return querable.ToListAsync();
         }
 
-        public async Task InsertAllAsync<T>(List<T> list)
+        public async Task<List<object>> InsertAllAsync<T>(List<T> list)
             where T : class
         {
+            var lst = new List<object>();
             foreach (var item in list)
             {
-                await InsertAsync(item);
+                lst.Add(await InsertAsync(item));
             }
+
+            return lst;
+        }
+
+        public async Task<List<TKey>> InsertAllAsync<T, TKey>(List<T> list)
+            where T : class
+            where TKey : struct
+        {
+            var lst = new List<TKey>();
+            foreach (var itemKey in await InsertAsync<T>(list))
+            {
+                lst.Add((TKey)itemKey);
+            }
+
+            return lst;
         }
 
         // Protected implementation of Dispose pattern.

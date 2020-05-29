@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Framework.Infrastructure.Utils
 {
@@ -305,6 +306,135 @@ namespace Framework.Infrastructure.Utils
             return ContainsCheckWithVaidationFunction(s, startLen, endLen, char.IsNumber);
         }
 
+        public static string SubstringByChar(this string str, char separtor)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+                return string.Empty;
+
+            var strIndex = str.IndexOf(separtor);
+
+            if (strIndex == -1)
+                return string.Empty;
+
+            var index = strIndex + 1;
+
+            return str.Substring(index);
+        }
+
+        public static string[] SplitByComma(string source)
+        {
+            var perms = source.Split(new char[1] { ',' });
+            for (int i = 0; i < perms.Length; i++)
+            {
+                perms[i] = perms[i].Trim();
+            }
+
+            return perms;
+        }
+
+        public static string GetChainByLinkCount(string chain, int maxlink)
+        {
+            if (string.IsNullOrWhiteSpace(chain))
+                return "";
+            var buf = new StringBuilder();
+            var slist = SplitByDelim(chain, '-');
+            for (int i = 0; i < maxlink && slist.Length > i; i++)
+            {
+                if (i != 0)
+                    buf.Append("-");
+                buf.Append(slist[i]);
+            }
+
+            return buf.ToString();
+        }
+
+        public static string[] SplitByDelim(string source, char delim)
+        {
+            var perms = source.Split(new char[1] { delim });
+            for (int i = 0; i < perms.Length; i++)
+            {
+                perms[i] = perms[i].Trim();
+            }
+
+            return perms;
+        }
+
+        public static string ConvertArrayToString(string[] source)
+        {
+            var buf = new StringBuilder(20);
+            bool first = true;
+            foreach (string s in source)
+            {
+                if (!first)
+                    buf.Append(",");
+                buf.Append(s);
+                first = false;
+            }
+
+            return buf.ToString();
+        }
+
+        public static int[] SplitByCommaInt32(string source)
+        {
+            var values = source.Split(new char[1] { ',' });
+            var lstIntValues = new List<int>();
+            foreach (string v in values)
+            {
+                lstIntValues.Add(Convert.ToInt32(v));
+            }
+
+            return lstIntValues.ToArray();
+        }
+
+        public static string InitialCap(this string inStr)
+        {
+            if (inStr == null || inStr.Trim().Length == 0)
+                return "";
+            var lowerStr = inStr.ToLower();
+            var str = lowerStr.Substring(0, 1).ToUpper();
+            if (lowerStr.Length > 1)
+                str += lowerStr.Substring(1);
+
+            return str;
+        }
+
+        public static List<string> SplitOnSpace(this string text)
+        {
+            if (text == null)
+                return new List<string>();
+            return text.Split(' ').ToList();
+        }
+
+        public static string SplitCamelCase(this string input)
+        {
+            if (input == null)
+                return "";
+            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+        }
+
+        public static string FirstFewChars(this string item, int count)
+        {
+            if (item == null)
+                return null;
+
+            if (item.Length < count)
+                return item;
+            return item.Substring(0, count);
+        }
+
+        public static string LastFewChars(this string item, int count)
+        {
+            if (item == null)
+                return null;
+
+            if (item.Length < count)
+                return item;
+
+            var start = item.Length - count;
+
+            return item.Substring(start);
+        }
+
         private static bool ContainsCheckWithVaidationFunction(this string s, int startLen, int endLen, Func<char, bool> validationFunction)
         {
             if (string.IsNullOrEmpty(s))
@@ -322,7 +452,7 @@ namespace Framework.Infrastructure.Utils
 
         private static int GetNextInt32(RNGCryptoServiceProvider rnd)
         {
-            byte[] randomInt = new byte[4];
+            var randomInt = new byte[4];
             rnd.GetBytes(randomInt);
             return Convert.ToInt32(randomInt[0]);
         }

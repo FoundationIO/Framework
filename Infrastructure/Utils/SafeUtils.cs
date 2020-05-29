@@ -5,6 +5,9 @@ This work is licensed under the terms of the BSD license.
 For a copy, see <https://opensource.org/licenses/BSD-3-Clause>.
 **/
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+#pragma warning disable CA1031
 
 namespace Framework.Infrastructure.Utils
 {
@@ -32,6 +35,39 @@ namespace Framework.Infrastructure.Utils
             }
         }
 
+        public static List<int> Int(List<string> objList, int defaultValue = 0)
+        {
+            List<int> result = new List<int>();
+            foreach (var obj in objList)
+            {
+                if (obj == null)
+                {
+                    result.Add(defaultValue);
+                    continue;
+                }
+
+                try
+                {
+                    if (int.TryParse(obj, out int res))
+                    {
+                        result.Add(res);
+                        continue;
+                    }
+
+                    result.Add(defaultValue);
+                }
+                catch (Exception)
+                {
+                    result.Add(defaultValue);
+#pragma warning disable S3626 // Jump statements should not be redundant
+                    continue;
+#pragma warning restore S3626 // Jump statements should not be redundant
+                }
+            }
+
+            return result;
+        }
+
         public static bool Bool(string obj, bool defaultValue = false)
         {
             if (string.IsNullOrEmpty(obj))
@@ -39,7 +75,7 @@ namespace Framework.Infrastructure.Utils
                 return defaultValue;
             }
 
-            string bstr = obj.Trim().ToUpper();
+            var bstr = obj.Trim().ToUpper();
             if ((bstr == "ON") || (bstr == "T") || (bstr == "TRUE") || (bstr == "Y") || (bstr == "YES") || (bstr == "1") || (Int(bstr) > 0))
             {
                 return true;
@@ -142,7 +178,7 @@ namespace Framework.Infrastructure.Utils
 
                 return defaultValue;
             }
-            catch
+            catch (Exception)
             {
                 return defaultValue;
             }
@@ -159,7 +195,7 @@ namespace Framework.Infrastructure.Utils
             {
                 return Convert.ToSingle(obj);
             }
-            catch
+            catch (Exception)
             {
                 return defaultValue;
             }
@@ -176,9 +212,23 @@ namespace Framework.Infrastructure.Utils
             {
                 return Convert.ToDouble(obj);
             }
-            catch
+            catch (Exception)
             {
                 return defaultValue;
+            }
+        }
+
+        public static T Enum<T, TValue>(TValue enumValueToConvert, object defaultValue)
+        {
+            var enumValue = default(T);
+            try
+            {
+                var str = enumValueToConvert.ToString();
+                return Enum<T>(str, defaultValue);
+            }
+            catch (Exception)
+            {
+                return enumValue;
             }
         }
 
@@ -267,6 +317,20 @@ namespace Framework.Infrastructure.Utils
             }
         }
 
+        public static TimeSpan Timespan(object objValue)
+        {
+            var strValue = objValue as string;
+            return Timespan(strValue);
+        }
+
+        public static TimeSpan Timespan(string strValue)
+        {
+            if (TimeSpan.TryParse(strValue, out TimeSpan tValue))
+                return tValue;
+
+            return TimeSpan.MinValue;
+        }
+
         public static Guid Guid(string value, System.Guid defaultValue)
         {
             try
@@ -278,15 +342,23 @@ namespace Framework.Infrastructure.Utils
 
                 return defaultValue;
             }
-            catch
+            catch (Exception)
             {
                 return defaultValue;
             }
         }
 
+        public static Guid Guid(object value)
+        {
+            if (value == null)
+                return System.Guid.Empty;
+
+            return Guid(value.ToString(), System.Guid.NewGuid());
+        }
+
         public static Guid Guid(string value)
         {
-            return Guid(value, System.Guid.NewGuid());
+            return Guid(value, System.Guid.Empty);
         }
 
         public static DateTime DateTime(string obj, DateTime defaultValue)
@@ -305,7 +377,7 @@ namespace Framework.Infrastructure.Utils
 
                 return defaultValue;
             }
-            catch
+            catch (Exception)
             {
                 return defaultValue;
             }
@@ -322,7 +394,7 @@ namespace Framework.Infrastructure.Utils
             {
                 return obj.Value;
             }
-            catch
+            catch (Exception)
             {
                 return defaultValue;
             }
@@ -332,5 +404,20 @@ namespace Framework.Infrastructure.Utils
         {
             return DateTime(obj, System.DateTime.MinValue);
         }
+
+        public static T To<T>(string v, T defaultValue = default(T))
+        {
+            try
+            {
+                var t = typeof(T);
+                var tc = TypeDescriptor.GetConverter(t);
+                return (T)tc.ConvertFrom(v);
+            }
+            catch (Exception)
+            {
+                return defaultValue;
+            }
+        }
     }
 }
+#pragma warning restore CA1031

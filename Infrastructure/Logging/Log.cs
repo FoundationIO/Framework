@@ -53,6 +53,18 @@ namespace Framework.Infrastructure.Logging
                 var rule1 = new LoggingRule(AppLoggerName, NLog.LogLevel.Trace, fileTarget);
                 nlogConfig.LoggingRules.Add(rule1);
 
+                var fileTarget2 = new FileTarget
+                {
+                    FileName = this.logConfig.LogLocation + Path.DirectorySeparatorChar + baseConfig.AppName + Path.DirectorySeparatorChar + "AppLogs" + Path.DirectorySeparatorChar + "${shortdate}.error.log",
+                    Layout = AppFileLayout,
+                    ConcurrentWrites = true,
+                    ArchiveEvery = FileArchivePeriod.Month,
+                    MaxArchiveFiles = 30
+                };
+
+                var rule2 = new LoggingRule(AppLoggerName, NLog.LogLevel.Error, fileTarget2);
+                nlogConfig.LoggingRules.Add(rule2);
+
                 if (this.logConfig.LogPerformance)
                 {
                     fileTarget = new FileTarget

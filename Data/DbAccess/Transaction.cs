@@ -8,6 +8,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Framework.Infrastructure.Constants;
+using Framework.Infrastructure.Exceptions;
 using Framework.Infrastructure.Interfaces.DbAccess;
 
 namespace Framework.Data.DbAccess
@@ -107,7 +108,7 @@ namespace Framework.Data.DbAccess
 
                         if (Marshal.GetExceptionPointers() == IntPtr.Zero)
                         {
-                            throw new Exception("Transaction is cancelled - Complete(Async) or Rollack(Async) is not called explicitly with in the transaction");
+                            throw new RollbackException("Transaction is cancelled - Complete(Async) or Rollack(Async) is not called explicitly with in the transaction");
                         }
                     }
                 }

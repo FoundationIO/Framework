@@ -28,6 +28,7 @@ namespace Framework.Infrastructure.Utils
         {
             return JsonSerializer.Deserialize<T>(jsonStr, new JsonSerializerOptions
             {
+                PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 IgnoreNullValues = true,
             });

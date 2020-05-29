@@ -10,6 +10,8 @@ namespace Framework.Infrastructure.Models.Config
     {
         public string Name { get; set; }
 
+        public bool UseEnvironmentVariables { get; set; }
+
         public string DatabaseType { get; set; }
 
         public string DatabaseName { get; set; }

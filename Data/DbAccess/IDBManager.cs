@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Framework.Infrastructure.Constants;
+using Framework.Infrastructure.Interfaces.DbAccess;
 using Framework.Infrastructure.Models.Result;
 using LinqToDB;
 using LinqToDB.Data;
@@ -33,6 +34,10 @@ namespace Framework.Data.DbAccess
         int CommitTransaction();
 
         int RollbackTransaction();
+
+        ITransaction BeginTransactionWithTransactionManager(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified);
+
+        Task<ITransaction> BeginTransactionWithTransactionManagerAsync(DBTransactionIsolationLevel dBTransactionIsolationLevel = DBTransactionIsolationLevel.Unspecified);
 
         bool Exists<T>()
             where T : class;
@@ -64,14 +69,36 @@ namespace Framework.Data.DbAccess
         object Insert<T>(T obj)
             where T : class;
 
+        TKey Insert<T, TKey>(T obj)
+            where T : class
+            where TKey : struct;
+
         void InsertWithAudit<T>(IEnumerable<T> objs, string createdBy)
+            where T : class;
+
+        void InsertWithAudit<T>(IEnumerable<T> objs, long? createdBy)
             where T : class;
 
         object InsertWithAudit<T>(T obj, string createdBy)
             where T : class;
 
-        void InsertAll<T>(List<T> list)
+        TKey InsertWithAudit<T, TKey>(T obj, string createdBy)
+            where T : class
+            where TKey : struct;
+
+        object InsertWithAudit<T>(T obj, long? createdBy)
             where T : class;
+
+        TKey InsertWithAudit<T, TKey>(T obj, long? createdBy)
+            where T : class
+            where TKey : struct;
+
+        List<object> InsertAll<T>(List<T> list)
+            where T : class;
+
+        List<TKey> InsertAll<T, TKey>(List<T> list)
+            where T : class
+            where TKey : struct;
 
         List<T> Select<T>(Expression<Func<T, bool>> predicate)
             where T : class;
@@ -85,16 +112,22 @@ namespace Framework.Data.DbAccess
         DbReturnListModel<T> SelectByPageWithTotalRows<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
             where T : class;
 
-        void Update<T>(IEnumerable<T> objs)
+        bool Update<T>(IEnumerable<T> objs)
             where T : class;
 
-        void Update<T>(T obj)
+        bool Update<T>(T obj)
             where T : class;
 
-        void UpdateWithAudit<T>(IEnumerable<T> objs, string modifiedBy)
+        bool UpdateWithAudit<T>(IEnumerable<T> objs, string modifiedBy)
             where T : class;
 
-        void UpdateWithAudit<T>(T obj, string modifiedBy)
+        bool UpdateWithAudit<T>(IEnumerable<T> objs, long? modifiedBy)
+            where T : class;
+
+        bool UpdateWithAudit<T>(T obj, string modifiedBy)
+            where T : class;
+
+        bool UpdateWithAudit<T>(T obj, long? modifiedBy)
             where T : class;
 
         //Async
@@ -125,19 +158,49 @@ namespace Framework.Data.DbAccess
         Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate)
             where T : class;
 
-        Task InsertAsync<T>(IEnumerable<T> objs)
-            where T : class;
+        Task<List<object>> InsertAsync<T>(IEnumerable<T> objs)
+                    where T : class;
+
+        Task<List<TKey>> InsertAsync<T, TKey>(IEnumerable<T> objs)
+            where T : class
+            where TKey : struct;
 
         Task<object> InsertAsync<T>(T obj)
             where T : class;
 
-        Task InsertWithAuditAsync<T>(IEnumerable<T> objs, string createdBy)
+        Task<TKey> InsertAsync<T, TKey>(T obj)
+            where T : class
+            where TKey : struct;
+
+        Task<List<object>> InsertWithAuditAsync<T>(IEnumerable<T> objs, string createdBy)
             where T : class;
+
+        Task<List<TKey>> InsertWithAuditAsync<T, TKey>(IEnumerable<T> objs, string createdBy)
+         where T : class
+         where TKey : struct;
+
+        Task<List<object>> InsertWithAuditAsync<T>(IEnumerable<T> objs, long? createdBy)
+            where T : class;
+
+        Task<List<TKey>> InsertWithAuditAsync<T, TKey>(IEnumerable<T> objs, long? createdBy)
+         where T : class
+         where TKey : struct;
 
         Task<object> InsertWithAuditAsync<T>(T obj, string createdBy)
             where T : class;
 
-        Task InsertAllAsync<T>(List<T> list)
+        Task<TKey> InsertWithAuditAsync<T, TKey>(T obj, string createdBy)
+            where T : class
+            where TKey : struct;
+
+        Task<object> InsertWithAuditAsync<T>(T obj, long? createdBy)
+            where T : class;
+
+        Task<TKey> InsertWithAuditAsync<T, TKey>(T obj, long? createdBy)
+            where T : class
+            where TKey : struct;
+
+        Task<List<object>> InsertAllAsync<T>(List<T> list)
             where T : class;
 
         Task<List<T>> SelectAsync<T>(Expression<Func<T, bool>> predicate)
@@ -152,16 +215,22 @@ namespace Framework.Data.DbAccess
         Task<DbReturnListModel<T>> SelectByPageWithTotalRowsAsync<T>(int pageNumber, int pageSize, Expression<Func<T, bool>> predicate = null)
             where T : class;
 
-        Task UpdateAsync<T>(IEnumerable<T> objs)
+        Task<bool> UpdateAsync<T>(IEnumerable<T> objs)
             where T : class;
 
-        Task UpdateAsync<T>(T obj)
+        Task<bool> UpdateAsync<T>(T obj)
             where T : class;
 
-        Task UpdateWithAuditAsync<T>(IEnumerable<T> objs, string modifiedBy)
+        Task<bool> UpdateWithAuditAsync<T>(IEnumerable<T> objs, string modifiedBy)
             where T : class;
 
-        Task UpdateWithAuditAsync<T>(T obj, string modifiedBy)
+        Task<bool> UpdateWithAuditAsync<T>(IEnumerable<T> objs, long? modifiedBy)
+            where T : class;
+
+        Task<bool> UpdateWithAuditAsync<T>(T obj, string modifiedBy)
+            where T : class;
+
+        Task<bool> UpdateWithAuditAsync<T>(T obj, long? modifiedBy)
             where T : class;
     }
 }

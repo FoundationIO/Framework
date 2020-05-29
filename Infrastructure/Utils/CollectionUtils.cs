@@ -99,5 +99,21 @@ namespace Framework.Infrastructure.Utils
 
             return source.Select<TSource, TResult>(selector).ToList();
         }
+
+        public static List<TResult> SelectToDistinctList<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
+        {
+            if (source == null)
+                return new List<TResult>();
+
+            return source.Select<TSource, TResult>(selector).Distinct().ToList();
+        }
+
+        public static List<TResult> SelectToDistinctList<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, TResult> selector)
+        {
+            if (source == null)
+                return new List<TResult>();
+
+            return source.Select<TSource, TResult>(selector).Distinct().ToList();
+        }
     }
 }

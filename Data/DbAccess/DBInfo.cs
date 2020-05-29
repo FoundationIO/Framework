@@ -13,8 +13,10 @@ using FluentMigrator.Runner.Processors;
 using Framework.Infrastructure.Config;
 using Framework.Infrastructure.Constants;
 using Framework.Infrastructure.Models.Config;
+using LinqToDB;
 using LinqToDB.DataProvider;
 using LinqToDB.DataProvider.MySql;
+using LinqToDB.DataProvider.PostgreSQL;
 using LinqToDB.DataProvider.SQLite;
 using LinqToDB.DataProvider.SqlServer;
 
@@ -23,8 +25,9 @@ namespace Framework.Data.DbAccess
     public abstract class DBInfo : IDBInfo
     {
         private static readonly SqlServerDataProvider SqlServerProvider = new SqlServerDataProvider("default", SqlServerVersion.v2008);
-        private static readonly SQLiteDataProvider Sqlite3Provider = new SQLiteDataProvider();
+        private static readonly SQLiteDataProvider Sqlite3Provider = new SQLiteDataProvider(ProviderName.SQLiteClassic);
         private static readonly MySqlDataProvider MySqlProvider = new MySqlDataProvider();
+        private static readonly PostgreSQLDataProvider PostgresProvider = new PostgreSQLDataProvider();
         private readonly IBaseConfiguration config;
         private readonly string profileName;
 
@@ -74,6 +77,12 @@ namespace Framework.Data.DbAccess
                             break;
                         }
 
+                    case DBType.POSTGRESQL:
+                        {
+                            dbName = "postgres";
+                            break;
+                        }
+
                     case DBType.SQLSERVER:
                         {
                             dbName = "master";
@@ -102,9 +111,22 @@ namespace Framework.Data.DbAccess
                         break;
                     }
 
+                case DBType.POSTGRESQL:
+                    {
+                        //Postgresql supports only less than 1024 poolsize
+                        if (workerThreads > 1024)
+                            workerThreads = 1024;
+
+                        if (dbConnectionInfo.DatabaseUseIntegratedLogin)
+                            connectionStr = $"Integrated Security=true;Server={dbConnectionInfo.DatabaseServer};Database={dbName};Application Name={config.AppName};MaxPoolSize={workerThreads};";
+                        else
+                            connectionStr = $"Server={dbConnectionInfo.DatabaseServer};Database={dbName};Userid={dbConnectionInfo.DatabaseUserName};Password={dbConnectionInfo.DatabasePassword};Application Name={config.AppName};MaxPoolSize={workerThreads};";
+                        break;
+                    }
+
                 case DBType.SQLITE3:
                     {
-                        connectionStr = $"Data Source={dbConnectionInfo.DatabaseName}";
+                        connectionStr = $"Data Source={dbConnectionInfo.DatabaseName};BinaryGUID=False";
                         break;
                     }
 
@@ -154,6 +176,11 @@ namespace Framework.Data.DbAccess
                         return new FluentMigrator.Runner.Processors.MySql.MySql5ProcessorFactory();
                     }
 
+                case DBType.POSTGRESQL:
+                    {
+                        return new FluentMigrator.Runner.Processors.Postgres.PostgresProcessorFactory();
+                    }
+
                 default:
                     {
                         throw new Exception($"Unable to get Migration Process Factory, Unknown Database type specified in the configuration {dbConnectionInfo.DatabaseType}");
@@ -186,6 +213,11 @@ namespace Framework.Data.DbAccess
                 case DBType.SQLSERVER:
                     {
                         return SqlServerProvider;
+                    }
+
+                case DBType.POSTGRESQL:
+                    {
+                        return PostgresProvider;
                     }
 
                 case DBType.SQLITE3:

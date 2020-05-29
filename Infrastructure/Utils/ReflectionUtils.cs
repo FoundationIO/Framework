@@ -81,7 +81,7 @@ namespace Framework.Infrastructure.Utils
                 throw new ArgumentNullException("obj");
             }
 
-            PropertyInfo pi = obj.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var pi = obj.GetType().GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (pi == null)
             {
                 throw new ArgumentOutOfRangeException("propName", string.Format("Property {0} was not found in Type {1}", propName, obj.GetType().FullName));
@@ -97,7 +97,7 @@ namespace Framework.Infrastructure.Utils
                 throw new ArgumentNullException("obj");
             }
 
-            Type t = obj.GetType();
+            var t = obj.GetType();
             FieldInfo fi = null;
             while (fi == null && t != null)
             {
@@ -115,7 +115,7 @@ namespace Framework.Infrastructure.Utils
 
         public static void SetPrivatePropertyValue<T>(object obj, string propName, T val)
         {
-            Type t = obj.GetType();
+            var t = obj.GetType();
             if (t.GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) == null)
             {
                 throw new ArgumentOutOfRangeException("propName", string.Format("Property {0} was not found in Type {1}", propName, obj.GetType().FullName));
@@ -131,7 +131,7 @@ namespace Framework.Infrastructure.Utils
                 throw new ArgumentNullException("obj");
             }
 
-            Type t = obj.GetType();
+            var t = obj.GetType();
             FieldInfo fi = null;
             while (fi == null && t != null)
             {
